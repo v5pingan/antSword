@@ -18,7 +18,11 @@ class PHP extends Base {
       'database/mysql',
       'database/mysqli',
       'database/mssql',
+      'database/sqlsrv',
       'database/oracle',
+      'database/oracle_oci8',
+      'database/postgresql',
+      'database/postgresql_pdo',
       'database/informix'
     ].map((_) => {
       this.parseTemplate(`./php/template/${_}`);
@@ -51,7 +55,7 @@ class PHP extends Base {
 
     // 组合完整的代码
     let tmpCode = data['_'];
-    data['_'] = `@ini_set("display_errors", "0");@set_time_limit(0);echo "${tag_s}";${tmpCode};echo "${tag_e}";die();`;
+    data['_'] = `@ini_set("display_errors", "0");@set_time_limit(0);echo "${tag_s}";try{${tmpCode};}catch(Exception $e){echo "ERROR://".$e->getMessage();};echo "${tag_e}";die();`;
 
     // 使用编码器进行处理并返回
     return this.encodeComplete(tag_s, tag_e, data);

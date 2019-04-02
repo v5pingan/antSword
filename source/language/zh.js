@@ -29,7 +29,8 @@ module.exports = {
       cut: '剪切',
       copy: '复制',
       paste: '粘贴',
-      selectall: '全选'
+      selectall: '全选',
+      search: '查找数据'
     },
     window: {
       title: '窗口',
@@ -61,6 +62,7 @@ module.exports = {
       edit: '编辑数据',
       delete: '删除数据',
       move: '移动数据',
+      copy: '创建副本',
       search: '搜索数据',
       plugin: '加载插件',
       pluginDefault: '默认分类',
@@ -96,6 +98,7 @@ module.exports = {
     },
     list: {
       title: '数据管理',
+      not_recommended: '不推荐',
       grid: {
         url: 'URL地址',
         ip: 'IP地址',
@@ -107,6 +110,7 @@ module.exports = {
       add: {
         title: '添加数据',
         toolbar: {
+          test: '测试连接',
           add: '添加',
           clear: '清空'
         },
@@ -118,6 +122,8 @@ module.exports = {
           type: '连接类型',
           encoder: '编码器'
         },
+        test_success: '连接成功!',
+        test_warning: '返回数据为空',
         warning: '请输入完整！',
         success: '添加数据成功！',
         error: (err) => antSword.noxss(`添加数据失败！\n${err}`)
@@ -169,6 +175,14 @@ module.exports = {
       },
       otherConf: {
         nohttps: '忽略HTTPS证书',
+        usemultipart: '使用 Multipart 发包',
+        chunk: {
+          title: '分块传输(实验性功能)',
+          usechunk: '开启分块传输发包',
+          min: '最小分块',
+          max: '最大分块',
+          exphint: '该功能目前为实验性功能, 无法与 Multipart 同时使用,部分类型的服务端可能不支持Chunked传输。此外,建议超时时长设置30s以上,避免网速不好的情况下影响数据传输。',
+        },
         terminalCache: '虚拟终端使用缓存',
         filemanagerCache: '文件管理使用缓存',
         uploadFragment: '上传文件分片大小',
@@ -185,7 +199,22 @@ module.exports = {
       system: '系统信息',
       user: '当前用户',
       path: '当前路径'
-    }
+    },
+    ascmd: {
+      help: '输入 ashelp 查看本地命令',
+      ashelp: `使用帮助:
+ ascmd file\t\t指定file来执行命令, eg: ascmd /bin/bash
+ quit\t\t关闭终端
+ exit\t\t关闭终端
+
+快捷键:
+ Ctrl =\t\t放大字体
+ Ctrl -\t\t缩小字体
+ Ctrl L\t\t清屏
+ Ctrl U\t\t清除当前行
+`,
+      ascmd: (cmd) => antSword.noxss(`将使用 ${cmd} 执行命令.`),
+    },
   },
   filemanager: {
     title: '文件管理',
@@ -306,7 +335,11 @@ module.exports = {
             }
           },
           preview: '预览文件',
-          edit: '编辑文件',
+          edit: {
+            title: '编辑文件',
+            openwindow: '窗口打开',
+            opentab: '标签打开',
+          },
           delete: '删除文件',
           rename: '重命名文件',
           refresh: '刷新目录',
@@ -317,6 +350,10 @@ module.exports = {
           chmod: '更改权限',
           copy: {
             title: '复制文件',
+            copyname: '复制文件名',
+            copypath: '复制文件路径',
+            copysuccess: '复制到剪贴板成功!',
+            copyfail: '复制到剪贴板失败!',
             warning: (id) => antSword.noxss(`已经添加到剪贴板！\n${id}`),
             info: (id) => antSword.noxss(`添加文件到剪贴板\n${id}`)
           },
@@ -324,7 +361,8 @@ module.exports = {
             title: '新建',
             folder: '目录',
             file: '文件'
-          }
+          },
+          terminal: '在此处打开终端'
         }
       }
     },
@@ -333,7 +371,7 @@ module.exports = {
       toolbar: {
         save: '保存',
         mode: '高亮',
-        encode: '编码'
+        encode: '用此编码打开'
       },
       loadErr: (err) => antSword.noxss(`加载文件出错！\n${err}`),
       success: (path) => antSword.noxss(`保存文件成功！\n${path}`),
@@ -371,6 +409,7 @@ module.exports = {
       add: '添加',
       del: '删除',
       edit: '编辑',
+      check: '检测',
       menu: {
         add: '添加配置',
         del: '删除配置',
@@ -415,7 +454,8 @@ module.exports = {
       toolbar: {
         add: '添加',
         clear: '清空',
-        edit: '编辑'
+        edit: '编辑',
+        test: '测试连接'
       },
       conn: '连接字符串',
       type: '数据库类型',
@@ -425,6 +465,8 @@ module.exports = {
       passwd: '连接密码',
       warning: '请填写完整！',
       success: '成功添加配置！',
+      test_success: '连接成功!',
+      test_warning: '返回数据为空',
       del: {
         title: '删除配置',
         confirm: '确定删除此配置吗？',
@@ -499,6 +541,12 @@ module.exports = {
         success: '删除列成功',
         error: '删除列失败',
       }
+    },
+    probedb: {
+      title: '检测数据库函数支持',
+      success: '检测完毕',
+      coltype: '连接类型',
+      issupport: '状态',
     }
   },
   settings: {
@@ -656,6 +704,55 @@ module.exports = {
           }
         }
       }
+    },
+    adefault: {
+      title: '默认设置',
+      success: '保存成功',
+      error: '保存失败！',
+      confirm: {
+        content: '重启应用生效，是否重启？',
+        title: '更改默认设置'
+      },
+      toolbar: {
+        save: '保存',
+      },
+      filemanager: {
+        title: '文件管理',
+        openfileintab: {
+          title: '文件打开方式',
+          window: '窗口打开',
+          tab: '标签打开',
+        },
+        bookmark: {
+          title: '全局书签',
+          nodata: '当前暂无数据, 请单击鼠标右键添加',
+          grid: {
+            name: '名称',
+            path: '目录'
+          },
+          bmenu: {
+            add: '添加书签',
+            del: '删除书签'
+          },
+          add: {
+            title: '添加全局书签',
+            success: '添加成功',
+            namedup: '名称不能重复',
+            name_invalid: '名称不合法',
+            addbtn: '确定'
+          },
+          del: {
+            title: '删除书签',
+            confirm: (num) => antSword.noxss(`你确定要删除 ${typeof(num) === 'number' ? num + ' 个书签' : num+" "}吗？`),
+            success: '删除成功'
+          },
+          edit: {
+            namedup: '名称不能重复',
+            name_invalid: '名称不合法',
+            success: '更新成功'
+          }
+        },
+      }
     }
   },
   plugin: {
@@ -667,6 +764,7 @@ module.exports = {
   },
   viewsite: {
     toolbar: {
+      useproxy: (s) => `代理: ${s?'开':'关'}`,
       save: '保存',
       view: '浏览'
     },

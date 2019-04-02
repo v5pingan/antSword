@@ -36,6 +36,8 @@ class Folder {
       self.cache[_] = {};
       self.tree.deleteItem(_);
     });
+    // 移除根节点下的所有节点
+    self.tree.deleteChildItems(self.tree.rootId);
     // 1. 分解当前路径
     let curPath = '';
     path.split('/').map((p) => {

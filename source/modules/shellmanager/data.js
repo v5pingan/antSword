@@ -26,7 +26,7 @@ module.exports = {
       data.push({
         id: _['_id'],
         data: [
-          _['url'], _['ip'], _['addr'], _['note'],
+          antSword.noxss(_['url']), _['ip'], _['addr'], antSword.noxss(_['note']),
           new Date(_['ctime']).format('yyyy/MM/dd hh:mm:ss'),
           new Date(_['utime']).format('yyyy/MM/dd hh:mm:ss')
         ]

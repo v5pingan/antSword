@@ -24,6 +24,8 @@
 已知问题：
  1. 文件管理遇到中文文件名显示的问题
 ChangeLog:
+  v1.4
+    1. 修正 windows 下基础路径获取盘符会出现小写的情况
   v1.3
    1. 修正上传文件超过1M时的bug
    2. 修正weblogic war 包布署获取路径问题
@@ -282,6 +284,7 @@ ChangeLog:
             String cd = this.getClass().getResource("/").getPath();
             d = new File(cd).getParent();
         }
+        d = String.valueOf(d.charAt(0)).toUpperCase() + d.substring(1);
         String serverInfo = (String)System.getProperty("os.name");
         String separator = File.separator;
         String user = (String)System.getProperty("user.name");

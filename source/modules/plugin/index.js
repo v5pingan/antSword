@@ -29,9 +29,9 @@ class Plugin {
       return this.win.focus();
     }
     let win = new antSword['remote'].BrowserWindow({
-      width: 930,
+      width: 950,
       height: 666,
-      minWidth: 888,
+      minWidth: 650,
       minHeight: 555,
       show: false,
       title: 'AntSword.Store'
@@ -39,10 +39,17 @@ class Plugin {
     win.on('close', () => {
       this.win = win = null;
     });
-    win.loadURL(url);
-    win.show();
-    // win.openDevTools();
-    this.win = win;
+    let ses = win.webContents.session;
+    let proxyuri = "";
+    if(antSword.aproxymode != "noproxy") {
+      proxyuri = antSword.aproxyuri;
+    }
+    ses.setProxy({proxyRules: proxyuri}, ()=>{
+      win.loadURL(url);
+      win.show();
+      // win.openDevTools();
+      this.win = win;
+    });
   }
 
 

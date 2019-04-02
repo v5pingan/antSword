@@ -85,6 +85,17 @@ window.addEventListener('load', () => {
     });
   }
 
+  /**
+   * 加载界面 UI 修改
+   */
+  function loadingUI() {
+    let now = new Date();
+    /** 加载圣诞节 loading 效果 */
+    if(now.getMonth()+1 == 12) {
+      document.getElementById('loading').classList.add('loading_christmas');
+    }
+  }
+  loadingUI();
   // 开始加载css
   loadCSS('ant-static://libs/bmenu/bmenu.css')
     .then(() => loadCSS('ant-static://libs/toastr/toastr.min.css'))

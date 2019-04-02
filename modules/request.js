@@ -7,10 +7,12 @@
 
 const fs = require('fs'),
   iconv = require('iconv-lite'),
+  jschardet = require('jschardet'),
   through = require('through'),
   CONF = require('./config'),
   superagent = require('superagent'),
   superagentProxy = require('superagent-proxy');
+const { Readable } = require("stream");
 
 let logger;
 // 请求UA
@@ -99,7 +101,7 @@ class Request {
     if(opts['url'].match(CONF.urlblacklist)) {
       return event.sender.send('request-error-' + opts['hash'], "Blacklist URL");
     }
-    const _request = superagent.post(opts['url']);
+    let _request = superagent.post(opts['url']);
     // 设置headers
     _request.set('User-Agent', USER_AGENT);
     // 自定义headers
@@ -108,36 +110,95 @@ class Request {
     }
     // 自定义body
     const _postData = Object.assign({}, opts.body, opts.data);
-    _request
-      .proxy(APROXY_CONF['uri'])
-      .type('form')
-      // 超时
-      .timeout(opts.timeout || REQ_TIMEOUT)
-      // 忽略HTTPS
-      .ignoreHTTPS(opts['ignoreHTTPS'])
-      .send(_postData)
-      .parse((res, callback) => {
-        this.parse(opts['tag_s'], opts['tag_e'], (chunk) => {
-          event.sender.send('request-chunk-' + opts['hash'], chunk);
-        }, res, callback);
-      })
-      .end((err, ret) => {
-        if (!ret) {
-          // 请求失败 TIMEOUT
-          return event.sender.send('request-error-' + opts['hash'], err);
+    if (opts['useChunk'] == 1){
+      logger.debug("request with Chunked");
+      let _postarr = [];
+      for(var key in _postData){
+        if(_postData.hasOwnProperty(key)){
+          _postarr.push(`${key}=${encodeURIComponent(_postData[key])}`);
         }
-        let buff = ret.hasOwnProperty('body') ? ret.body : new Buffer();
-        // 解码
-        let text = iconv.decode(buff, opts['encode']);
-        if (err && text == "") {
-          return event.sender.send('request-error-' + opts['hash'], err);
-        };
-        // 回调数据
-        event.sender.send('request-' + opts['hash'], {
-          text: text,
-          buff: buff
+      }
+      let antstream = new AntRead(_postarr.join("&"), {'step': parseInt(opts['chunkStepMin']), 'stepmax': parseInt(opts['chunkStepMax'])});
+      let _datasuccess = false; // 表示是否是 404 类shell
+      _request
+        .proxy(APROXY_CONF['uri'])
+        .type('form')
+        // .set('Content-Type', 'application/x-www-form-urlencoded')
+        .timeout(opts.timeout || REQ_TIMEOUT)
+        .ignoreHTTPS(opts['ignoreHTTPS'])
+        .parse((res, callback) => {
+          this.parse(opts['tag_s'], opts['tag_e'], (chunk) => {
+            event.sender.send('request-chunk-' + opts['hash'], chunk);
+          }, res, (err, ret)=>{
+            let buff = ret ? ret : new Buffer();
+            // 自动猜测编码
+            let encoding = detectEncoding(buff, {defaultEncoding: "unknown"});
+            logger.debug("detect encoding:", encoding);
+            encoding = encoding != "unknown" ? encoding : opts['encode'];
+            let text = iconv.decode(buff, encoding);
+            if (err && text == "") {
+              return event.sender.send('request-error-' + opts['hash'], err);
+            };
+            // 回调数据
+            event.sender.send('request-' + opts['hash'], {
+              text: text,
+              buff: buff,
+              encoding: encoding
+            });
+            _datasuccess = true;
+            callback(null, ret);
+          });
+        }).on('error', (err) => {
+          if(_datasuccess == false) {
+            return event.sender.send('request-error-' + opts['hash'], err);
+          }
         });
-      });
+        antstream.pipe(_request);
+    }else{
+      // 通过替换函数方式来实现发包方式切换, 后续可改成别的
+      const old_send = _request.send;
+      if(opts['useMultipart'] == 1) {
+        _request.send = _request.field;
+      }else{
+        _request.send = old_send;
+      }
+      _request
+        .proxy(APROXY_CONF['uri'])
+        .type('form')
+        // 超时
+        .timeout(opts.timeout || REQ_TIMEOUT)
+        // 忽略HTTPS
+        .ignoreHTTPS(opts['ignoreHTTPS'])
+        .send(_postData)
+        .parse((res, callback) => {
+          this.parse(opts['tag_s'], opts['tag_e'], (chunk) => {
+            event.sender.send('request-chunk-' + opts['hash'], chunk);
+          }, res, callback);
+        })
+        .end((err, ret) => {
+          if (!ret) {
+            // 请求失败 TIMEOUT
+            return event.sender.send('request-error-' + opts['hash'], err);
+          }
+          let buff = ret.hasOwnProperty('body') ? ret.body : new Buffer();
+          // 解码
+          let text = "";
+          // 自动猜测编码
+          let encoding = detectEncoding(buff, {defaultEncoding:"unknown"});
+          logger.debug("detect encoding:", encoding);
+          encoding = encoding != "unknown" ? encoding : opts['encode'];
+          text = iconv.decode(buff, encoding);
+          if (err && text == "") {
+            return event.sender.send('request-error-' + opts['hash'], err);
+          };
+          // 回调数据
+          event.sender.send('request-' + opts['hash'], {
+            text: text,
+            buff: buff,
+            encoding: encoding
+          });
+        });
+      }
   }
 
   /**
@@ -158,7 +219,7 @@ class Request {
     let indexEnd = -1;
     let tempData = [];
 
-    const _request = superagent.post(opts['url']);
+    let _request = superagent.post(opts['url']);
     // 设置headers
     _request.set('User-Agent', USER_AGENT);
     // 自定义headers
@@ -167,41 +228,92 @@ class Request {
     }
     // 自定义body
     const _postData = Object.assign({}, opts.body, opts.data);
-    _request
-      .proxy(APROXY_CONF['uri'])
-      .type('form')
-      // 设置超时会导致文件过大时写入出错
-      // .timeout(timeout)
-      // 忽略HTTPS
-      .ignoreHTTPS(opts['ignoreHTTPS'])
-      .send(_postData)
-      .pipe(through(
-        (chunk) => {
-          // 判断数据流中是否包含后截断符？长度++
-          let temp = chunk.indexOf(opts['tag_e']);
-          if (temp !== -1) {
-            indexEnd = Buffer.concat(tempData).length + temp;
-          };
-          tempData.push(chunk);
-          event.sender.send('download-progress-' + opts['hash'], chunk.length);
-        },
-        () => {
-          let tempDataBuffer = Buffer.concat(tempData);
-
-          indexStart = tempDataBuffer.indexOf(opts['tag_s']) || 0;
-          // 截取最后的数据
-          let finalData = new Buffer(tempDataBuffer.slice(
-            indexStart + opts['tag_s'].length,
-            indexEnd
-          ), 'binary');
-          // 写入文件流&&关闭
-          rs.write(finalData);
-          rs.close();
-          event.sender.send('download-' + opts['hash'], finalData.length);
-          // 删除内存数据
-          finalData = tempDataBuffer = tempData = null;
+    if (opts['useChunk'] == 1){
+      logger.debug("request with Chunked");
+      let _postarr = [];
+      for(var key in _postData){
+        if(_postData.hasOwnProperty(key)){
+          _postarr.push(`${key}=${_postData[key]}`);
         }
+      }
+      let antstream = new AntRead(_postarr.join("&"), {'step': parseInt(opts['chunkStepMin']), 'stepmax': parseInt(opts['chunkStepMax'])});
+      let _datasuccess = false; // 表示是否是 404 类shell
+      _request
+        .proxy(APROXY_CONF['uri'])
+        .type('form')
+        .ignoreHTTPS(opts['ignoreHTTPS'])
+        .pipe(through(
+          (chunk) => {
+            // 判断数据流中是否包含后截断符？长度++
+            let temp = chunk.indexOf(opts['tag_e']);
+            if (temp !== -1) {
+              indexEnd = Buffer.concat(tempData).length + temp;
+            };
+            tempData.push(chunk);
+            event.sender.send('download-progress-' + opts['hash'], chunk.length);
+          },
+          () => {
+            let tempDataBuffer = Buffer.concat(tempData);
+
+            indexStart = tempDataBuffer.indexOf(opts['tag_s']) || 0;
+            // 截取最后的数据
+            let finalData = new Buffer(tempDataBuffer.slice(
+              indexStart + opts['tag_s'].length,
+              indexEnd
+            ), 'binary');
+            // 写入文件流&&关闭
+            rs.write(finalData);
+            rs.close();
+            event.sender.send('download-' + opts['hash'], finalData.length);
+            // 删除内存数据
+            finalData = tempDataBuffer = tempData = null;
+          }
       ));
+      antstream.pipe(_request);
+    }else{
+      // 通过替换函数方式来实现发包方式切换, 后续可改成别的
+      const old_send = _request.send;
+      if(opts['useMultipart'] == 1) {
+        _request.send = _request.field;
+      }else{
+        _request.send = old_send;
+      }
+      _request
+        .proxy(APROXY_CONF['uri'])
+        .type('form')
+        // 设置超时会导致文件过大时写入出错
+        // .timeout(timeout)
+        // 忽略HTTPS
+        .ignoreHTTPS(opts['ignoreHTTPS'])
+        .send(_postData)
+        .pipe(through(
+          (chunk) => {
+            // 判断数据流中是否包含后截断符？长度++
+            let temp = chunk.indexOf(opts['tag_e']);
+            if (temp !== -1) {
+              indexEnd = Buffer.concat(tempData).length + temp;
+            };
+            tempData.push(chunk);
+            event.sender.send('download-progress-' + opts['hash'], chunk.length);
+          },
+          () => {
+            let tempDataBuffer = Buffer.concat(tempData);
+
+            indexStart = tempDataBuffer.indexOf(opts['tag_s']) || 0;
+            // 截取最后的数据
+            let finalData = new Buffer(tempDataBuffer.slice(
+              indexStart + opts['tag_s'].length,
+              indexEnd
+            ), 'binary');
+            // 写入文件流&&关闭
+            rs.write(finalData);
+            rs.close();
+            event.sender.send('download-' + opts['hash'], finalData.length);
+            // 删除内存数据
+            finalData = tempDataBuffer = tempData = null;
+          }
+      ));
+    }
   }
 
   /**
@@ -264,6 +376,108 @@ class Request {
     });
   }
 
+}
+
+/**
+ * 判断指定buffer对象的字符编码
+ * ref: https://github.com/LeoYuan/leoyuan.github.io/issues/25
+ * @param buffer
+ * @param options
+ *  - defaultEncoding 指定默认编码集
+ *  - minConfidence   指定可接受的最小confidence，如果判断结果小于此值，则用defaultEncoding
+ *  - verbose         返回更加详细的字符编码数据
+ * @returns {*}
+ */
+function detectEncoding(buffer, options) {
+
+  options = options || {};
+  buffer = buffer || Buffer('');
+
+  var DEFAULT_ENCODING = 'GBK', MIN_CONFIDENCE = 0.96;
+  var verbose = options.verbose;
+  var defaultEncoding = options.defaultEncoding || DEFAULT_ENCODING;
+  var minConfidence = options.minConfidence || MIN_CONFIDENCE;
+  var ret = jschardet.detect(buffer), encoding = ret.encoding === 'ascii' ? 'utf-8' : ret.encoding,
+      confidence = ret.confidence;
+  // var VALID_ENCODINGS = ['gb2312', 'gbk', 'utf-8', 'big5', 'euc-kr','euc-jp'];
+
+  if (encoding === null || !iconv.encodingExists(encoding) || confidence < minConfidence) {
+      return verbose ? {
+          encoding: defaultEncoding,
+          oriEncoding: encoding,
+          confidence: confidence
+      } : defaultEncoding;
+  } else {
+      encoding = encoding.toUpperCase();
+      return verbose ? {
+          encoding: encoding,
+          oriEncoding: encoding,
+          confidence: confidence
+      } : encoding;
+  }
+};
+
+
+/**
+ * 控步长的可读流
+ * @param data  [string|buffer] 输入源
+ * @param options {} 配置
+ *    step     步长
+ *    stepmax  最大步长,默认与步长相等,如果大于步长，则每次读取时后随机返回 [step, stepmax] 长度的数据
+ */
+class AntRead extends Readable {
+  constructor(data, options={}) {
+    super();
+    this.index = 0;
+    let o = {};
+    o.step = options.hasOwnProperty('step') ? parseInt(options['step']) : 2;
+    o.step = o.step < 1 ? 2 : o.step;
+    o.stepmax = options.hasOwnProperty('stepmax') ? options['stepmax'] : o.step ;
+    if (o.stepmax < o.step) {
+      o.stepmax = o.step;
+    }
+    let chunk;
+    if('string' === typeof data) {
+      chunk = data;
+    }else if('object' === typeof data && Buffer.isBuffer(data)) { // buffer
+      chunk = new Buffer(data).toString();
+    }else{
+      throw Error("data must be string, buffer.");
+    }
+    this.chunk = chunk;
+    this.o = o;
+  }
+
+  // 重写自定义的可读流的 _read 方法
+  _read() {
+      let blakwords = /eval|assert|base64_decode|preg_replace|call_user_func|create_function|str_replace|array_map|system|popen|exec|function_exists|passthru|shell_exec|frombase64string|unsafe|response|execute/i;
+      let step = this.randomNum(this.o.step, this.o.stepmax);
+      if (this.index >= this.chunk.length) {
+          this.push(null);
+      }else{
+          let _subcode = this.chunk.substring(this.index, this.index + step) + "";
+          let m = _subcode.match(blakwords);
+          if(m) {
+            let sub_step = this.randomNum(1, m[0].length - 1);
+            _subcode = _subcode.substring(0, m.index + sub_step);
+            step = m.index + sub_step;
+          }
+          this.push(_subcode);
+      }
+      this.index += step;
+  }
+
+  // random [n, m]
+  randomNum(minNum, maxNum){ 
+    switch(arguments.length){ 
+        case 1: 
+          return parseInt(Math.random()*minNum+1,10);
+        case 2: 
+          return parseInt(Math.random()*(maxNum-minNum+1)+minNum,10); 
+        default:
+          return 0; 
+    } 
+  }
 }
 
 module.exports = Request;

@@ -39,6 +39,12 @@ class FileManager {
     antSword['modules']['filemanager'] = antSword['modules']['filemanager'] || {};
     antSword['modules']['filemanager'][hash] = this;
 
+    let config = {
+      openfileintab: false,
+      bookmarks: {},
+    };
+    
+    this.config = JSON.parse(antSword['storage']("adefault_filemanager", false, JSON.stringify(config)));
     this.isWin = true;
     this.path = '/';
     this.home = '/';
@@ -89,10 +95,13 @@ class FileManager {
     };
     let info_path = info[0].replace(/\\/g, '/').replace(/\.$/, '');
     let info_drive = info[1];
-
     // 判断是否为linux
     if (info_path.substr(0, 1) === '/') {
       this.isWin = false;
+    }else{
+      // windows 盘符统一大写
+      info_path = `${info_path.substr(0,1).toUpperCase()}${info_path.substr(1)}`;
+      info_drive = info_drive.toUpperCase();
     };
     this.path = info_path;
     this.home = info_path;
@@ -132,7 +141,14 @@ class FileManager {
   getFiles(p, callback) {
 
     let self = this;
+    if(self.isWin) { // 处理输入为 f:\ 这种情况
+      p = p.replace(/\\/g, '/');
+      p = p.substr(1,2) == ":/" ? `${p.substr(0,1).toUpperCase()}${p.substr(1)}` : p;
+    }
     let path = this.changePath(p);
+    if (self.isWin){ // 处理输入为 f: 这种情况
+      path = path.substr(1,2) == ":/" ? `${path.substr(0,1).toUpperCase()}${path.substr(1)}` : path;
+    }
     let cache;
 
     if (!path.endsWith('/')) { path += '/' };
@@ -788,17 +804,30 @@ class FileManager {
   }
 
   // 编辑文件
-  editFile(name) {
+  editFile(name, openfileintab=false) {
     let self = this;
     let path = this.path + name;
     let editor = null;
     let codes = '';
-    // 创建窗口
-    let win = this.createWin({
-      title: LANG['editor']['title'](path),
-      width: 800
-    });
-    win.maximize();
+    let win;
+    let hinttext = '';
+    if (openfileintab == false){
+      win = this.createWin({
+        title: LANG['editor']['title'](path),
+        width: 800
+      });
+      win.maximize();  
+    }else{
+      let _id = String(Math.random()).substr(5, 10);
+      antSword['tabbar'].addTab(
+        `tab_file_${_id}`,
+        `<i class="fa fa-file-o"></i> ${name}`,
+        null, null, true, true
+      );
+      win = antSword['tabbar'].cells(`tab_file_${_id}`);
+      hinttext = `IP:${this.opts['ip']} File:${path}`;
+    }
+
     win.progressOn();
 
     // 检测文件后缀
@@ -828,9 +857,11 @@ class FileManager {
       _options.push(_opt);
     }
     toolbar.loadStruct([
-      { id: 'save', type: 'button', icon: 'save', text: LANG['editor']['toolbar']['save'] },
+      { id: 'hinttext', type: 'text', text: hinttext},
       { type: 'separator' },
       { type: 'spacer' },
+      { id: 'save', type: 'button', icon: 'save', text: LANG['editor']['toolbar']['save'] },
+      { type: 'separator' },
       {
         id: 'encode', type: 'buttonSelect', icon: 'language', openAll: true,
         text: LANG['editor']['toolbar']['encode'],
@@ -881,7 +912,7 @@ class FileManager {
         editor.session.setMode(`ace/mode/${mode}`);
       }else if (id.startsWith('encode_')) {
         let encode = id.split('_')[1];
-        editor.session.setValue(iconv.encode(codes, encode).toString());
+        editor.session.setValue(iconv.decode(new Buffer(codes), encode).toString());
       }else{
         console.info('toolbar.onClick', id);
       }
@@ -894,7 +925,13 @@ class FileManager {
       })
     ).then((res) => {
       let ret = res['text'];
-      codes = ret;
+      codes = res['buff'];
+      let encoding = res['encoding'] || this.opts['encode'];
+      if(encoding.toUpperCase() == "UTF-8") {
+        encoding = "UTF8";
+      }
+      toolbar.setListOptionSelected('encode', `encode_${encoding}`);
+
       win.progressOff();
 
       // 初始化编辑器

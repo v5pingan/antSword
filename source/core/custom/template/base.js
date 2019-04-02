@@ -4,5 +4,6 @@
 //
 
 module.exports = () => ({
-  info: 'A'
+  info: 'A',
+  probedb: 'Z', // 检测数据库函数支持
 })

@@ -12,6 +12,7 @@ const Language = require('./language');
 const AProxy = require('./aproxy');
 const Display = require('./display');
 const Encoders = require('./encoders');
+const ADefault = require('./adefault');
 
 class Settings {
 
@@ -47,6 +48,7 @@ class Settings {
     this.display = new Display(sidebar);
     // Encoders
     this.encoders = new Encoders(sidebar);
+    this.adefault = new ADefault(sidebar);
     this.cell = cell;
     this.sidebar = sidebar;
 

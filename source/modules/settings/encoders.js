@@ -101,7 +101,7 @@ class Encoders {
             toastr.error(LANG['message']['ename_duplicate'], LANG_T['error']);
             return;
           }
-          fs.renameSync(oepath, path.join(process.env.AS_WORKDIR, `antData/encoders/${oetype}/encoder/${nValue}.js`));
+          fs.renameSync(oepath, path.join(remote.process.env.AS_WORKDIR, `antData/encoders/${oetype}/encoder/${nValue}.js`));
           toastr.success(LANG['message']["rename_success"],LANG_T["success"]);
           break
           case 2:
@@ -114,7 +114,7 @@ class Encoders {
             toastr.error(LANG['message']['ename_duplicate'], LANG_T['error']);
             return;
           }
-          fs.renameSync(oepath, path.join(process.env.AS_WORKDIR, `antData/encoders/${nValue}/encoder/${oename}.js`));
+          fs.renameSync(oepath, path.join(remote.process.env.AS_WORKDIR, `antData/encoders/${nValue}/encoder/${oename}.js`));
           toastr.success(LANG['message']["retype_success"],LANG_T["success"]);
           break
         }
@@ -145,7 +145,7 @@ class Encoders {
         layer.close(i);
         return
       }
-      let savePath= path.join(process.env.AS_WORKDIR,`antData/encoders/${t}/encoder/${value}.js`);
+      let savePath= path.join(remote.process.env.AS_WORKDIR,`antData/encoders/${t}/encoder/${value}.js`);
 
       fs.writeFileSync(savePath, self.default_template);
 
@@ -320,7 +320,7 @@ module.exports = (pwd, data) => {
         data.push({
           id: _id,
           ename: _,
-          epath: path.join(process.env.AS_WORKDIR, `antData/encoders/${t}/encoder/${_}`),
+          epath: path.join(remote.process.env.AS_WORKDIR, `antData/encoders/${t}/encoder/${_}`),
           etype: t,
           data: [
             `<i class="fa fa-file-code-o"></i>`,
@@ -343,7 +343,7 @@ module.exports = (pwd, data) => {
     antSword['encoders'] = (function(){
       var encoders = {asp:[],aspx:[],php:[],custom:[]};
       var encoders_path = {asp:[],aspx:[],php:[],custom:[]};
-      let userencoder_path = path.join(process.env.AS_WORKDIR,'antData/encoders');
+      let userencoder_path = path.join(remote.process.env.AS_WORKDIR,'antData/encoders');
       // 初始化
       !fs.existsSync(userencoder_path) ? fs.mkdirSync(userencoder_path) : null;
       ['asp','aspx','php','custom'].map((t)=>{
@@ -369,5 +369,4 @@ module.exports = (pwd, data) => {
     this.parseData();
   }
 }
-
 module.exports = Encoders;

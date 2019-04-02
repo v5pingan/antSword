@@ -28,7 +28,8 @@ module.exports = {
       cut: 'Cut',
       copy: 'Copy',
       paste: 'Paste',
-      selectall: 'SelectAll'
+      selectall: 'SelectAll',
+      search: 'Search'
     },
     window: {
       title: 'Window',
@@ -60,6 +61,7 @@ module.exports = {
       edit: 'Edit',
       delete: 'Delete',
       move: 'Move',
+      copy: 'Copy',
       search: 'Search',
       plugin: 'Plugins',
       pluginDefault: 'Default',
@@ -95,6 +97,7 @@ module.exports = {
     },
     list: {
       title: 'Shell Lists',
+      not_recommended: 'Not recommended',
       grid: {
         url: 'URL',
         ip: 'IP',
@@ -106,6 +109,7 @@ module.exports = {
       add: {
         title: 'Add shell',
         toolbar: {
+          test: 'Test Connection',
           add: 'Add',
           clear: 'Clear'
         },
@@ -117,6 +121,8 @@ module.exports = {
           type: 'Shell type',
           encoder: 'Encoder'
         },
+        test_success: 'Connection Successful!',
+        test_warning: 'Response is null!',
         warning: 'Please enter the full!',
         success: 'Add shell success!',
         error: (err) => antSword.noxss(`Add shell failed!\n${err}`)
@@ -168,6 +174,14 @@ module.exports = {
       },
       otherConf: {
         nohttps: 'Ignore HTTPS certificate',
+        usemultipart: 'Use Multipart send payload',
+        chunk: {
+          title: 'Chunked Transfer (Experimentally)',
+          usechunk: 'Use Chunked send payload.',
+          min: 'Min Block',
+          max: 'Max Block',
+          exphint: 'This feature is currently experimental and cannot be used with Multipart. Some types of servers may not support Chunked transfers. In addition, it is recommended to set the timeout period to 30s or more to avoid data transmission when the network speed is not good.',
+        },
         terminalCache: "Use the terminal's cache",
         filemanagerCache: "Use the filemanager's cache",
         uploadFragment: "Upload File Fragmentation Size",
@@ -184,7 +198,22 @@ module.exports = {
       system: 'System  Info',
       user: 'Current User',
       path: 'Current Path'
-    }
+    },
+    ascmd: {
+      help: 'Enter ashelp to view local commands',
+      ashelp: `Usage:
+ ascmd file\t\tExecute the command with file, eg: ascmd /bin/bash
+ quit\t\tClose terminal
+ exit\t\tClose terminal
+
+Hot Keys:
+ Ctrl =\t\tIncrease font
+ Ctrl -\t\tDecrease font
+ Ctrl L\t\tClean screen
+ Ctrl U\t\tClear the current row
+ `,
+      ascmd: (cmd) => antSword.noxss(`Will execute the command with ${cmd}.`),
+    },
   },
   filemanager: {
     title: 'FileManager',
@@ -305,7 +334,11 @@ module.exports = {
             }
           },
           preview: 'Preview',
-          edit: 'Edit',
+          edit: {
+            title: 'Edit',
+            openwindow: 'Open in Window',
+            opentab: 'Open in Tab',
+          },
           delete: 'Delete',
           rename: 'Rename',
           refresh: 'Refresh',
@@ -316,6 +349,10 @@ module.exports = {
           chmod: 'Chmod',
           copy: {
             title: 'Copy',
+            copyname: 'Copy FileName',
+            copypath: 'Copy FilePath',
+            copysuccess: 'Copy to clipboard successfully!',
+            copyfail: 'Copy to clipboard failed!',
             warning: (id) => antSword.noxss(`Already add to clipboard!\n${id}`),
             info: (id) => antSword.noxss(`Add file to the clipboard.\n${id}`)
           },
@@ -323,7 +360,8 @@ module.exports = {
             title: 'Create',
             folder: 'Folder',
             file: 'File'
-          }
+          },
+          terminal: 'Open Terminal Here'
         }
       }
     },
@@ -332,7 +370,7 @@ module.exports = {
       toolbar: {
         save: 'Save',
         mode: 'Mode',
-        encode: 'Encode'
+        encode: 'Open with Encoding'
       },
       loadErr: (err) => antSword.noxss(`Load file error!\n${err}`),
       success: (path) => antSword.noxss(`Save the file success!\n${path}`),
@@ -370,6 +408,7 @@ module.exports = {
       add: 'Add',
       del: 'Del',
       edit: 'Edit',
+      check: 'Check',
       menu: {
         add: 'Add conf',
         del: 'Del conf',
@@ -414,7 +453,8 @@ module.exports = {
       toolbar: {
         add: 'Add',
         clear: 'Clear',
-        edit: 'Edit'
+        edit: 'Edit',
+        test: 'Test connect'
       },
       conn: 'Connection String',
       type: 'Database type',
@@ -424,6 +464,8 @@ module.exports = {
       passwd: 'Password',
       warning: 'Please fill in the complete!',
       success: 'Successful add configuration!',
+      test_success: 'Connection Successful!',
+      test_warning: 'Response is null!',
       del: {
         title: 'Delete configuration',
         confirm: 'Determine delete this configuration?',
@@ -498,6 +540,12 @@ module.exports = {
         success: 'Delete column successfully',
         error: 'Failed to delete column',
       }
+    },
+    probedb: {
+      title: 'Detect database function support',
+      success: 'Check completed',
+      coltype: 'ConnType',
+      issupport: 'Support',
     }
   },
   settings: {
@@ -655,6 +703,55 @@ module.exports = {
           }
         }
       }
+    },
+    adefault: {
+      title: 'Default Setting',
+      success: 'Save default settings successfully!',
+      error: 'Failed to save the default settings!',
+      confirm: {
+        content: 'Restart the application to take effect, whether to restart?',
+        title: 'Change default settings'
+      },
+      toolbar: {
+        save: 'Save',
+      },
+      filemanager: {
+        title: 'FileManager',
+        openfileintab: {
+          title: 'Open File in',
+          window: 'Window',
+          tab: 'Tab',
+        },
+        bookmark: {
+          title: 'Global Bookmark',
+          nodata: 'No data, click the right mouse button add',
+          grid: {
+            name: 'Name',
+            path: 'Path'
+          },
+          bmenu: {
+            add: 'Add Bookmark',
+            del: 'Del Bookmark'
+          },
+          add: {
+            title: 'Add to global bookmark',
+            success: 'Add success',
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            addbtn: 'Confirm'
+          },
+          del: {
+            title: 'Delete Bookmark',
+            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number' ? num + ' Bookmarks' : num+" "}？`),
+            success: 'Delete success'
+          },
+          edit: {
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            success: 'Edit success'
+          }
+        },
+      }
     }
   },
   plugin: {
@@ -667,6 +764,7 @@ module.exports = {
   },
   viewsite: {
     toolbar: {
+      useproxy: (s) => `Proxy: ${s?'ON':'OFF'}`,
       save: 'Save',
       view: 'View'
     },

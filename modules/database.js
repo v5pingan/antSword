@@ -41,9 +41,34 @@ class Database {
       .on('shell-delDataConf', this.delDataConf.bind(this))
       .on('shell-getDataConf', this.getDataConf.bind(this))
       .on('shell-renameCategory', this.renameShellCategory.bind(this))
-      .on('shell-updateHttpConf', this.updateHttpConf.bind(this));
+      .on('shell-updateHttpConf', this.updateHttpConf.bind(this))
+      .on('shell-addPluginDataConf', this.addPluginDataConf.bind(this))
+      .on('shell-editPluginDataConf', this.editPluginDataConf.bind(this))
+      .on('shell-delPluginDataConf', this.delPluginDataConf.bind(this))
+      .on('shell-getPluginDataConf', this.getPluginDataConf.bind(this));
   }
 
+  convertOptstoNedbQuery(opts={}) {
+    var self = this;
+    if(opts instanceof Array) {
+      for (let i = 0; i < opts.length; i++) {
+        opts[i] = self.convertOptstoNedbQuery(opts[i]);
+      }
+    }else if(opts instanceof Object) {
+      Object.keys(opts).map((f) => {
+        if(opts[f] instanceof Object) {
+          opts[f] = self.convertOptstoNedbQuery(opts[f]);
+        }
+        if(f == "$regex") {
+          if(opts[f].charAt(0) == '*') {
+            opts[f] = opts[f].substring(1);
+          }
+          opts[f] = new RegExp(opts[f], 'i');
+        }
+      });
+    }
+    return opts;
+  }
   /**
    * 查询shell数据
    * @param  {Object} event ipcMain对象
@@ -51,6 +76,7 @@ class Database {
    * @return {[type]}       [description]
    */
   findShell(event, opts = {}) {
+    opts = this.convertOptstoNedbQuery(opts);
     logger.debug('findShell', opts);
     this.cursor
       .find(opts)
@@ -386,6 +412,120 @@ class Database {
       _id: opts['_id']
     }, (err, ret) => {
       const confs = ret['database'] || {};
+      event.returnValue = err || confs[opts['id']];
+    });
+  }
+
+  /**
+   * 添加插件数据配置
+   * @param {Object} event ipcMain对象
+   * @param  {string} plugin 插件注册的名称
+   * @param {Object} opts  配置（_id,data
+   */
+  addPluginDataConf(event, plugin, opts) {
+    logger.info('addPluginDataConf', plugin, opts);
+    // 1. 获取原配置列表
+    this.cursor.findOne({
+      _id: opts['_id']
+    }, (err, ret) => {
+      ret['plugins'] = ret['plugins'] || {};
+      let confs = ret['plugins'][plugin] || {};
+      // 随机Id（顺序增长
+      const random_id = parseInt(+new Date + Math.random() * 1000).toString(16);
+      // 添加到配置
+      confs[random_id] = opts['data'];
+      let setdata = {
+        utime: +new Date,
+      }
+      setdata[`plugins.${plugin}`] = confs;
+
+      // 更新
+      this.cursor.update({
+        _id: opts['_id']
+      }, {
+        $set: setdata
+      }, (_err, _ret) => {
+        event.returnValue = random_id;
+      });
+    });
+  }
+  /**
+   * 修改插件数据配置
+   * @param {Object} event ipcMain对象
+   * @param  {string} plugin 插件注册的名称
+   * @param {Object} opts  配置（_id,id,data
+   */
+  editPluginDataConf(event, plugin, opts) {
+    logger.info('editPluginDataConf', plugin, opts);
+    // 1. 获取原配置列表
+    this.cursor.findOne({
+      _id: opts['_id']
+    }, (err, ret) => {
+      ret['plugins'] = ret['plugins'] || {};
+      let confs = ret['plugins'][plugin] || {};
+      // 添加到配置
+      confs[opts['id']] = opts['data'];
+      let setdata = {
+        utime: +new Date,
+      }
+      setdata[`plugins.${plugin}`] = confs;
+      // 更新数据库
+      this.cursor.update({
+        _id: opts['_id']
+      }, {
+        $set: setdata
+      }, (_err, _ret) => {
+        event.returnValue = opts['id'];
+      });
+    });
+  }
+
+  /**
+   * 删除插件数据配置
+   * @param  {Object} event ipcMain对象
+   * @param  {string} plugin 插件注册的名称
+   * @param  {Object} opts  配置（_id,id
+   * @return {[type]}       [description]
+   */
+  delPluginDataConf(event, plugin, opts) {
+    logger.info('delPluginDataConf', plugin, opts);
+    // 1. 获取原配置
+    this.cursor.findOne({
+      _id: opts['_id']
+    }, (err, ret) => {
+      ret['plugins'] = ret['plugins'] || {};
+      let confs = ret['plugins'][plugin] || {};
+      // 2. 删除配置
+      delete confs[opts['id']];
+      let setdata = {
+        utime: +new Date,
+      }
+      setdata[`plugins.${plugin}`] = confs;
+      // 3. 更新数据库
+      this.cursor.update({
+        _id: opts['_id']
+      }, {
+        $set: setdata
+      }, (_err, _ret) => {
+        event.returnValue = _err || _ret;
+      });
+    })
+  }
+
+  /**
+   * 获取单个插件数据配置
+   * @param  {Object} event ipcMain对象
+   * @param  {string} plugin 插件注册的名称
+   * @param  {Object} opts  配置（_id,id
+   * @return {[type]}       [description]
+   */
+  getPluginDataConf(event, plugin, opts) {
+    logger.info('getPluginDatConf', plugin, opts);
+    this.cursor.findOne({
+      _id: opts['_id']
+    }, (err, ret) => {
+      ret['plugins'] = ret['plugins'] || {};
+      const confs = ret['plugins'][plugin] || {};
       event.returnValue = err || confs[opts['id']];
     });
   }

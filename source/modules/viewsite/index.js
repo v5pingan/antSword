@@ -24,7 +24,7 @@ class ViewSite {
 
     this.opts = opts;
     this.cell = tabbar.cells(`tab_viewsite_${hash}`);
-
+    this.useproxy = antSword.aproxymode !== "noproxy";
     // 初始化工具栏
     this.toolbar = this._initToolbar();
 
@@ -52,10 +52,21 @@ class ViewSite {
     const toolbar = this.cell.attachToolbar();
     toolbar.loadStruct([
       { id: 'url', width: 400, type: 'buttonInput', value: this.opts.url || 'loading..' },
+      { type: 'separator' },
+      { id: 'useproxy', type: 'buttonTwoState', icon: 'paper-plane', text: LANG['toolbar'].useproxy(this.useproxy), pressed: this.useproxy, disabled: antSword.aproxymode === "noproxy"},
+      { type: 'separator' },
       { id: 'view', type: 'button', icon: 'chrome', text: LANG['toolbar'].view },
       { type: 'separator' },
       { id: 'save', type: 'button', icon: 'save', text: LANG['toolbar'].save },
     ]);
+    toolbar.attachEvent('onStateChange', (id, state) => {
+      switch(id) {
+        case 'useproxy':
+          this.useproxy = state;
+          toolbar.setItemText('useproxy', `<i class="fa fa-paper-plane"></i> ${LANG['toolbar'].useproxy(this.useproxy)}`);
+        break;
+      }
+    });
     toolbar.attachEvent('onClick', (id) => {
       switch(id) {
         case 'save':
@@ -171,9 +182,19 @@ class ViewSite {
       },
       title: url
     });
-    win.loadURL(url);
-    win.show();
-    win.openDevTools();
+    win.on('close', () => {
+      win = null;
+    });
+    let ses = win.webContents.session;
+    let proxyuri = "";
+    if(this.useproxy && antSword.aproxymode != "noproxy") {
+      proxyuri = antSword.aproxyuri;
+    }
+    ses.setProxy({proxyRules: proxyuri}, ()=>{
+      win.loadURL(url);
+      win.show();
+      win.openDevTools();
+    });
   }
 }
 

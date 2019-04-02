@@ -11,9 +11,16 @@ html, body, #container, #loading {
   position: fixed;
   background-color: #FFF;
   text-align: center;
-  background-image: url(ant-static://imgs/load.png);
   background-repeat: no-repeat;
   background-position: 50% 50%;
+}
+
+.loading_default {
+  background-image: url(ant-static://imgs/load.png);
+}
+
+.loading_christmas {
+  background-image: url(ant-static://imgs/load-christmas.png);
 }
 
 /*sidebar.bubble*/

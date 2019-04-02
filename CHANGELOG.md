@@ -2,6 +2,187 @@
 > 有空会补补BUG、添添新功能。    
 > 同时也欢迎大家的参与！感谢各位朋友的支持！ .TAT.
 
+## `v(2.0.7)`
+
+### 核心
+
+* 执行命令新增 `antsystem` 函数, 具体见: https://github.com/AntSwordProject/ant_php_extension
+* Fix 编码器保存后不生效的问题 #135 (thx @K4ngx)
+
+## 2019/03/20 `v(2.0.6)`
+
+### 后端模块
+
+* 分块传输自动根据黑名单字符(eg: eval, assert, execute, response 等)进行随机切割(thx @phith0n)
+
+### 数据库管理
+
+* 新增「测试连接」功能
+* 新增「检测」功能, 检测支持的数据库函数(目前仅 PHP,ASP,ASPX 有效, ASP(X)仅检测使用到的组件是否存在)
+* 新增 php `sqlsrv` 连接方式, php5.3之后 mssql 默认不存在,可使用该类型连接 sqlserver >= 2008
+
+> 如果直连shell本地sqlserver, host 部分填 localhost 或者 (local)
+>
+> 如果连接外部,使用 ip,port
+
+* 新增 php `oracle_oci8` 连接方式, 用于连接 oracle 8i,9i,10g,11g,12c
+
+> host 部分填写: localhost/orcl 或者 localhost:1521/orcl
+>
+> 参考: http://php.net/manual/zh/function.oci-connect.php  connection_string 部分
+
+* 新增 PHP PostgreSQL 类型数据库操作
+* 新增 PHP PostgreSQL_PDO 类型数据库操作 #133 (thx @B0y1n4o4)
+* 优化 asp(x) Oracle 类型数据库操作
+* 优化 asp(x) SQLServer 类型数据库操作
+* 优化SQLServer类型数据库默认查询语句
+* php数据管理解析数据时自动猜解编码
+
+### 文件管理
+
+* 新增「在此处打开终端」功能, 打开终端后快速跳到当前目录下
+* 新增「全局书签」功能, 可在「系统设置-默认设置」单击鼠标右键添加
+
+![](https://i.loli.net/2019/03/13/5c891b279c26a.png)
+
+![](https://i.loli.net/2019/03/13/5c891b2cc1c30.png)
+
+### 数据管理
+
+* shell 配置页面提示不推荐使用 default、random 编码器, 明文传输 Payload 容易受到转义等影响，未来版本将会考虑移除
+* 新增「创建副本」菜单, 复制所选择的 Shell 并在相同分类下创建一个副本
+* 新增「搜索数据」功能, 搜索本地数据，范围为当前分类下的 Shell
+
+可选搜索字段： URL(URL地址), Password(密码), Remark(备注), All(在以上几个字段中出现)
+
+> 如果想搜索其它类型的字段, 可直接在类型框中输入想要搜索的字段
+>
+> 例如搜索 IP地址, 可在搜索字段选择框中输入: ip
+>
+> 具体字段类型名请直接查阅 antData/db.ant
+
+唤醒快捷键 Ctrl+Shift+F 或者 Command + Shift + F (OSX)
+
+退出:
+
+1) 点击搜索框之外的任何区域
+
+2) 按下 `ESC` 键
+
+3) 再次按下唤醒快捷键
+
+> 在使用快捷键时,如果当前活动 tab 不是数据管理，则会自动跳回数据管理
+
+### 其它
+
+* 新增 「JSP Custom Shell For Oracle」
+* 新增 Decodes 自动猜解编码,在中文少量的情况下,成功率会降低
+* 系统托盘新增「重启应用」菜单
+* 虚拟终端打开后提示本地命令菜单 ashelp
+
+### BugFix
+
+* 修复 asp(x) sqlserver 获取列名,执行自定义SQL语句的异常
+* 修复 php mssql 获取列名,执行自定义SQL语句异常
+
+## 2019/03/04 `v(2.0.5)`
+
+### 后端模块
+
+* 新增 chunked 流式传输
+
+![chunk-2.png](https://i.loli.net/2019/01/28/5c4e8869c83ae.png)
+
+### Shell 管理
+
+* 新增「测试连接」功能
+* 其它设置增加「开启分块传输」开关，设置「最小分块」和「最大分块」。每次分块大小为[n, m]区间。
+
+![chunk-1.png](https://i.loli.net/2019/01/28/5c4e8868f178a.png)
+
+### 文件管理
+
+* 编辑文件标签打开时显示正在编辑的文件的「IP地址」和「绝对路径」 (#129)
+* 编辑文件「保存」按钮移动到右侧
+
+### 插件市场
+
+* 支持使用代理访问插件市场,当配置了代理之后，默认开启
+
+### 浏览网站
+
+* 新增代理开关, 在配置了代理之后，可通过该开关控制是否使用代理浏览目标网站
+
+### Other
+
+* 调整 aproxy uri 初始化 URL 格式
+
+## 2019/01/21 `v(2.0.4)`
+
+### 后端模块
+
+ * 优化返回包解码流程,增加自动猜解编码功能,该功能在中文较少时容易出错,出错了使用用户设置的字符编码
+
+### 文件管理
+
+ * 编辑文件窗口将「编码」按钮替换为「用此编码打开」, 若打开文件之后乱码，不妨试试切换编码
+ * 新增「复制文件名」和「复制文件路径」功能，目标复制文件名或路径到剪贴板
+ * 编辑文件菜单可选择「标签打开」和「窗口打开」
+
+### 虚拟终端
+
+ * 新增两条本地命令
+  * ashelp 列出所有本地命令
+  * ascmd  指定某个文件执行后续的命令. eg: ascmd /bin/bash 这样后续输入的命令将会使用 /bin/bash 来执行。注意仅对当前有效, 如果需要持久生效, 需要在shell配置中的「其它配置」设置。
+
+### 系统设置
+
+ * 新增「默认设置」, 可在此配置文件管理默认编辑文件打开方式
+
+### Other
+
+ * 新增 Python2 Custom CGI shell 示例
+
+### BugFix
+
+ * 修复Linux中编码设置中找到不到路径的问题 (#117) thx @H1d3r
+ * 修复 Windows shell 盘符小写引起文件管理目录树错乱的 Bug
+ * 修复 ASP 文件创建失败和删除失败时提示
+
+### 插件
+
+#### ASRedis
+
+* 新增「虚拟命令行」功能
+
+ ![](https://i.loli.net/2019/01/16/5c3f2134dcd8f.png)
+
+## 2018/12/25 `(v2.0.3)`
+
+### 模块增强
+
+#### Shell 管理
+
+ * 添加 Shell 时 URL 默认前缀 `http://`
+ * 添加 Shell 时根据文件后缀选择 Shell 类型并赋予默认编码(asp 默认 GBK, 其它默认 UTF8) #109
+ * 其它配置新增 `Multipart 发包` 功能
+
+#### 后端模块
+
+ * 数据存储新增插件配置存储管理功能 (`shell-addPluginDataConf`, `shell-editPluginDataConf`, `shell-delPluginDataConf`, `shell-getPluginDataConf`)
+ * 后台发包方式支持 `Multipart`, 可在「编辑Shell配置」-「其它配置」里选择是否开启此功能，默认关闭。(thx @phith0n)
+
+### Bug Fix
+
+ * 修复数据库编码无法保存的 Bug (#110 thx @Twi1ight)
+ * 修复 PHP Mysql(i) 数据管理模版代码中编码设置部分的错误 (#110 thx @Twi1ight)
+
+### Other
+
+ * 自动检查更新每24小时触发一次(GitHub 访问频率限制)
+ * 插件市场默认窗口大小调整
+ * Loading 界面增加了圣诞节彩蛋, 偶尔跟风过个节 🎄 Merry Christmas 🎄
+
 ## 2018/12/05 `(v2.0.2)`
 
 ### 模块增强

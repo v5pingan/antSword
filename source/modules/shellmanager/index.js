@@ -22,7 +22,20 @@ class ShellManager {
     // 初始化右侧栏：目录
     this.category = new Category(layout.cells('b'), this);
 
+    this.searchPop = null;
+    this.searchForm = null;
+    this.initSearchUI();
+
     this.reloadData();
+    // 注册菜单事件
+    antSword['menubar'].reg('shellmanager-search', () => {
+      antSword.tabbar.tabs("tab_shellmanager").setActive();
+      if(this.searchPop.isVisible()) {
+        this.searchPop.hide();
+      }else{
+        this.searchPop.show(120, document.body.clientHeight, 100, 100);
+      }
+    });
   }
 
   /**
@@ -31,6 +44,25 @@ class ShellManager {
    * @return {[type]}     [description]
    */
   reloadData(arg = {}) {
+    if(this.searchPop.isVisible()) {
+      let sdata = this.searchForm.getValues();
+      var searchObj = {};
+      switch(sdata['searchtype']) {
+        case 'all':
+          searchObj["$or"] = [
+            { "url": { $regex: sdata['searchtext']} },
+            { "pwd": { $regex: sdata['searchtext']} },
+            { "note": { $regex: sdata['searchtext']} },
+          ];
+          break;
+        default:
+          searchObj[sdata['searchtype']] = { $regex: sdata['searchtext']};
+        break;
+      }
+      // 获取当前分类
+      searchObj['category'] = this.category.sidebar.getActiveItem();
+      $.extend(arg, searchObj);
+    }
     const _data = Data.get(arg);
     // 刷新UI::数据
     this.list.grid.clearAll();
@@ -48,7 +80,7 @@ class ShellManager {
       this.category['sidebar'].addItem({
         id: _,
         bubble: _data['category'][_],
-        text: `<i class="fa fa-folder-o"></i> ${_}`
+        text: `<i class="fa fa-folder-o"></i> ${antSword.noxss(_)}`
       });
     }
     // 加载分类数据
@@ -58,6 +90,45 @@ class ShellManager {
     // 更新标题
     this.category.updateHeader();
     this.list.updateHeader(_data['data'].length);
+  }
+
+  initSearchUI() {
+    let that = this;
+    let searchPop = new dhtmlXPopup();
+    let formData = [
+      {type: "settings", position: "label-left", labelWidth: 80, inputWidth: 130},
+        {type: "combo", name: 'searchtype', options: [
+          {text: "All", value: "all", selected: true},
+          {text: "URL", value: "url" },
+          {text: "Password", value: "pwd" },
+          {text: "Remark", value: "note" },
+        ]},
+        {type: 'newcolumn', offset:20},
+        {type: "input", name: "searchtext"},
+    ];
+    searchPop.attachEvent("onShow", function(){
+      if (that.searchForm == null) {
+        that.searchForm = searchPop.attachForm(formData);
+        // that.searchForm.attachEvent("onButtonClick", function(){
+        //   searchPop.hide();
+        // });
+        that.searchForm.attachEvent("onInputChange", (name, value, form) => {
+          if(name == "searchtext") {
+            that.reloadData({});
+          }
+        });
+      }
+      // 去掉 popup 的角
+      var poparrows = document.getElementsByClassName('dhx_popup_arrow dhx_popup_arrow_top');
+      if (poparrows.length > 0 && poparrows[0].style.display != "none") {
+        poparrows[0].style.display="none";
+      }
+      that.searchForm.setItemFocus("searchtext");
+    });
+    // searchPop.attachEvent("onBeforeHide", function(type, ev, id){
+    //   return false;
+    // });
+    that.searchPop = searchPop;
   }
 }
 

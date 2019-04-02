@@ -182,6 +182,8 @@ class Base {
    */
   parseEncoder(enc) {
     // 加载编码器
+    // https://github.com/AntSwordProject/antSword/issues/135#issuecomment-475842870
+    delete require.cache[require.resolve(`${enc}`)];
     // QAQ！我也不知道为什么，如果直接require变量名，babel编译就会warning，so我只好加个`咯～
     this['__encoder__'][enc.indexOf(`encoder/`) > -1 ? enc.split(`encoder/`)[1]:enc.split(`encoder\\`)[1]] = require(`${enc}`);
   }
@@ -223,6 +225,7 @@ class Base {
         // 请求完毕返回数据{text,buff}
         .once(`request-${hash}`, (event, ret) => {
           return res({
+            'encoding': ret['encoding']||"",
             'text': ret['text'],
             'buff': ret['buff']
           });
@@ -244,6 +247,10 @@ class Base {
           tag_e: opt['tag_e'],
           encode: this.__opts__['encode'],
           ignoreHTTPS: (this.__opts__['otherConf'] || {})['ignore-https'] === 1,
+          useChunk: (this.__opts__['otherConf'] || {})['use-chunk'] === 1,
+          chunkStepMin: (this.__opts__['otherConf'] || {})['chunk-step-byte-min'] || 2,
+          chunkStepMax: (this.__opts__['otherConf'] || {})['chunk-step-byte-max'] || 3,
+          useMultipart: (this.__opts__['otherConf'] || {})['use-multipart'] === 1,
           timeout: parseInt((this.__opts__['otherConf'] || {})['request-timeout']),
           headers: (this.__opts__['httpConf'] || {})['headers'] || {},
           body: (this.__opts__['httpConf'] || {})['body'] || {}
@@ -285,6 +292,8 @@ class Base {
           data: opt['data'],
           tag_s: opt['tag_s'],
           tag_e: opt['tag_e'],
+          ignoreHTTPS: (this.__opts__['otherConf'] || {})['ignore-https'] === 1,
+          useMultipart: (this.__opts__['otherConf'] || {})['use-multipart'] === 1,
           encode: this.__opts__['encode']
         });
     })

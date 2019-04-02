@@ -16,6 +16,7 @@ const fs = require('fs'),
 
 const Menubar = require('./base/menubar');
 const CacheManager = require('./base/cachemanager');
+const Decodes = require('./base/decodes');
 
 const antSword = window.antSword = {
   /**
@@ -73,7 +74,7 @@ const antSword = window.antSword = {
     if (!value) {
       return localStorage.getItem(key) || def;
     };
-    if (typeof(x) === "object")
+    if (typeof(value) === "object")
       value = JSON.stringify(value);
     // 设置
     localStorage.setItem(key, value);
@@ -189,7 +190,7 @@ antSword['aproxyauth'] = (
   !aproxy['username'] || !aproxy['password']
 ) ? '' : `${aproxy['username']}:${aproxy['password']}`;
 
-antSword['aproxyuri'] = `${aproxy['protocol']}:\/\/${antSword['aproxyauth']}@${aproxy['server']}:${aproxy['port']}`;
+antSword['aproxyuri'] = `${aproxy['protocol']}:\/\/${antSword['aproxyauth']}${antSword['aproxyauth']===""?"":"@"}${aproxy['server']}:${aproxy['port']}`;
 
 // 通知后端设置代理
 ipcRenderer.send('aproxy', {
@@ -201,6 +202,7 @@ antSword['shell'] = shell;
 antSword['remote'] = remote;
 antSword['ipcRenderer'] = ipcRenderer;
 antSword['CacheManager'] = CacheManager;
+antSword['Decodes'] = new Decodes();
 antSword['menubar'] = new Menubar();
 antSword['package'] = require('../package');
 
@@ -334,9 +336,9 @@ ipcRenderer
               toastr.success(antSword["language"]["success"], LANG["message"]["extract"]);
             })
             .once(`update-error-${hash}`, (event, err)=>{
-              toastr.error(antSword["language"]['error'], LANG["message"]["fail"](err));
               win.win.progressOff();
               win.close();
+              toastr.error(antSword["language"]['error'], LANG["message"]["fail"](err));
             });
           break;
         case "canclebtn":
@@ -385,8 +387,12 @@ antSword.reloadPlug();
 antSword['menubar'].reg('check-update', ()=>{
   antSword.ipcRenderer.send('check-update');
 });
-// 检查更新
-setTimeout(
-  antSword.ipcRenderer.send.bind(antSword.ipcRenderer, 'check-update'),
-  1000 * 60
-);
+
+if(new Date() - new Date(antSword['storage']('lastautocheck', false, "0")) >= 86400000) {
+  // 检查更新
+  antSword['storage']('lastautocheck', new Date().getTime());
+  setTimeout(
+    antSword.ipcRenderer.send.bind(antSword.ipcRenderer, 'check-update'),
+    1000 * 60
+  );
+}
