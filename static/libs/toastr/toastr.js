@@ -234,12 +234,24 @@
         }
 
         if (map.title) {
-            $titleElement.append(map.title).addClass(options.titleClass);
+            $titleElement.append(String(map.title)
+            .replace(/<br\/>/g, "###asbr###")
+            .replace(/&/g, "&amp;")
+            .replace(/>/g, "&gt;")
+            .replace(/</g, "&lt;")
+            .replace(/"/g, "&quot;")
+            .replace(/###asbr###/g, "<br/>")).addClass(options.titleClass);
             $toastElement.append($titleElement);
         }
 
         if (map.message) {
-            $messageElement.append(map.message).addClass(options.messageClass);
+            $messageElement.append(String(map.message)
+            .replace(/<br\/>/g, "###asbr###")
+            .replace(/&/g, "&amp;")
+            .replace(/>/g, "&gt;")
+            .replace(/</g, "&lt;")
+            .replace(/"/g, "&quot;")
+            .replace(/###asbr###/g, "<br/>")).addClass(options.messageClass);
             $toastElement.append($messageElement);
         }
 
