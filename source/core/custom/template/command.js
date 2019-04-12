@@ -7,5 +7,9 @@ module.exports = () => ({
     _: 'M',
     'z1': '#{bin}',
     'z2': '#{cmd}'
+  },
+  listcmd: {
+    _: 'Y',
+    'z1': '#{binarr}',
   }
 })

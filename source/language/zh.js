@@ -203,7 +203,9 @@ module.exports = {
     ascmd: {
       help: '输入 ashelp 查看本地命令',
       ashelp: `使用帮助:
- ascmd file\t\t指定file来执行命令, eg: ascmd /bin/bash
+ ascmd [file]\t\t指定file来执行命令, eg: ascmd /bin/bash
+ aslistcmd\t\t列出可使用的命令解释器
+ aspowershell [on|off]\t\t启用/关闭PowerShell模式, eg: aspowershell on
  quit\t\t关闭终端
  exit\t\t关闭终端
 
@@ -212,8 +214,22 @@ module.exports = {
  Ctrl -\t\t缩小字体
  Ctrl L\t\t清屏
  Ctrl U\t\t清除当前行
+ Ctrl A\t\t光标到行首
+ Ctrl E\t\t光标到行尾
+ Ctrl F/B\t\t前进后退(相当于左右方向键)
+ Ctrl P\t\t上一条命令
+ Ctrl R\t\t搜索命令历史
+ Ctrl D\t\t删除当前光标的字符
+ Ctrl H\t\t删除光标之前的字符
+ Ctrl W\t\t删除光标之前的单词
+ Ctrl K\t\t删除到文本末尾
+ Ctrl T\t\t交换光标处文本
 `,
       ascmd: (cmd) => antSword.noxss(`将使用 ${cmd} 执行命令.`),
+      aspowershell: {
+        on: "已启用Powershell模式",
+        off: "已关闭Powershell模式",
+      },
     },
   },
   filemanager: {
@@ -556,7 +572,8 @@ module.exports = {
       homepage: '主页',
       document: '文档',
       qqgroup: 'Q群',
-      discord: '在线交流'
+      discord: '在线交流',
+      wechat: '关注微信公众号'
     },
     language: {
       title: '语言设置',
@@ -604,7 +621,7 @@ module.exports = {
         dling: (progress)=> `正在下载更新包...${progress}%`,
         dlingnp: (size)=> `正在下载更新包...${size}`,
         dlend: "下载完毕",
-        extract: "正在解压, 请务关闭程序",
+        extract: "正在解压, 请勿关闭程序",
         ing: '努力更新中。。',
         fail: (err) => `更新失败！【${err}】`,
         success: '更新成功！请稍后手动重启应用！'

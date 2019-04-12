@@ -158,7 +158,7 @@ class Base {
                       retStr = argv[tagStr] || '';
                     }
                     // 组合最终生成模板代码
-                    data[arg] = args[arg].replace(tag, retStr);
+                    data[arg] = data[arg].replace(tag, retStr);
                   }
                 )
               }
@@ -292,9 +292,15 @@ class Base {
           data: opt['data'],
           tag_s: opt['tag_s'],
           tag_e: opt['tag_e'],
+          encode: this.__opts__['encode'],
           ignoreHTTPS: (this.__opts__['otherConf'] || {})['ignore-https'] === 1,
+          useChunk: (this.__opts__['otherConf'] || {})['use-chunk'] === 1,
+          chunkStepMin: (this.__opts__['otherConf'] || {})['chunk-step-byte-min'] || 2,
+          chunkStepMax: (this.__opts__['otherConf'] || {})['chunk-step-byte-max'] || 3,
           useMultipart: (this.__opts__['otherConf'] || {})['use-multipart'] === 1,
-          encode: this.__opts__['encode']
+          timeout: parseInt((this.__opts__['otherConf'] || {})['request-timeout']),
+          headers: (this.__opts__['httpConf'] || {})['headers'] || {},
+          body: (this.__opts__['httpConf'] || {})['body'] || {}
         });
     })
   }

@@ -23,6 +23,10 @@ class About {
           <a href="http://doc.u0u.us"><i class="fa fa-book"></i> ${LANG['document']}</a> /
           <a href="https://discord.gg/Uzh5nUf"><i class="fa fa-comments"></i> ${LANG['discord']}</a>
         </p>
+        <div>
+          <img src="ant-static://imgs/qrcode.jpg" style="width:100px;"/>
+          <p style="color: #795548;transition: all .5s linear;font-size: 14px;">${LANG['wechat']}</p>
+        </div>
       </div>
     `);
 

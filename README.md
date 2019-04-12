@@ -1,4 +1,4 @@
-# AntSword [![release](https://img.shields.io/badge/release-v2.0.6-blue.svg?style=flat-square)][url-release]
+# AntSword [![release](https://img.shields.io/badge/release-v2.0.7-blue.svg?style=flat-square)][url-release]
 
 > AntSword in your hands, no worries in your mind！
 

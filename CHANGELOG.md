@@ -2,12 +2,44 @@
 > 有空会补补BUG、添添新功能。    
 > 同时也欢迎大家的参与！感谢各位朋友的支持！ .TAT.
 
-## `v(2.0.7)`
+## `v(2.0.8)`
+
+### 其它
+
+* 修正错别字 #145
+
+## 2019/04/08 `v(2.0.7)`
 
 ### 核心
 
 * 执行命令新增 `antsystem` 函数, 具体见: https://github.com/AntSwordProject/ant_php_extension
 * Fix 编码器保存后不生效的问题 #135 (thx @K4ngx)
+* Fix core download 参数遗漏问题 #142 (thx @RoyTse)
+* Fix #141 (thx @RoyTse)
+
+### 虚拟终端
+
+* 新增自定义命令 `aslistcmd`, 列出可使用的命令解释器 (#123)
+
+![aslistcmd.png](https://i.loli.net/2019/04/05/5ca74815a01a4.png)
+![aslistcmd_win.png](https://i.loli.net/2019/04/05/5ca74819b276e.png)
+
+* 新增自定义命令 `aspowershell [on|off]`, 开启/关闭 PowerShell 模式
+
+> 如果`ascmd`命令指定的PowerShell解释器文件名中包函`powershell`关键字, 会自动启用 PowerShell 模式, 如下图:
+
+![aspowershell_default](https://i.loli.net/2019/04/05/5ca753673efe7.png)
+
+> 如果指定的 PowerShell 解释器文件名中不包含 `powershell` 关键字, 则需要手动使用该命令，启用 PowerShell 模式。如果关闭了 PowerShell 模式,则会执行出错，如下图:
+
+![aspowershell_switch](https://i.loli.net/2019/04/05/5ca75368d85fa.png)
+
+### 其它
+
+* 修复默认设置保存时导致 bookmarks 清空的问题
+* PHP Custom Shell 新增 listcmd 功能
+* PHP Custom Shell 新增数据库支持函数检查接口
+* 新增「繁體中文(香港)」和「繁體中文(台灣)」两种语言
 
 ## 2019/03/20 `v(2.0.6)`
 
