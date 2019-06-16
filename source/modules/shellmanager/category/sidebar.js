@@ -38,14 +38,17 @@ class Sidebar {
   _onSelect(id) {
     // 更新工具栏按钮状态
     ['del', 'rename'].map((_) => {
-      this.top.toolbar[
-        id === 'default' ? 'disableItem' : 'enableItem'
-      ](_)
+      this.top.toolbar[id === 'default' ?
+        'disableItem' :
+        'enableItem'](_)
     });
     // 重新加载数据
-    this.top.top.reloadData({
-      category: id
-    });
+    this
+      .top
+      .top
+      .reloadData({
+        category: id
+      });
   }
 }
 

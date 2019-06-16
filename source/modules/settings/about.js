@@ -31,7 +31,7 @@ class About {
     `);
 
     // 在默认浏览器中打开链接
-    $('.about').on('click', 'a', function(e) {
+    $('.about').on('click', 'a', function (e) {
       e.preventDefault();
       antSword['shell'].openExternal(this.href);
     });

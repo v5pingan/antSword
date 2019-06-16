@@ -31,8 +31,13 @@ class Category {
    * @return {[type]}     [description]
    */
   updateHeader() {
-    const num = this.sidebar.getAllItems().length;
-    this.cell.setText(`<i class="fa fa-folder"></i> ${LANG['title']} (${num})`);
+    const num = this
+      .sidebar
+      .getAllItems()
+      .length;
+    this
+      .cell
+      .setText(`<i class="fa fa-folder"></i> ${LANG['title']} (${num})`);
   }
 }
 

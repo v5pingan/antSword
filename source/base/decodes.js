@@ -23,27 +23,35 @@ class Decodes {
     options = options || {};
     buffer = buffer || Buffer('');
 
-    var DEFAULT_ENCODING = 'GBK', MIN_CONFIDENCE = 0.96;
+    var DEFAULT_ENCODING = 'GBK',
+      MIN_CONFIDENCE = 0.96;
     var verbose = options.verbose;
     var defaultEncoding = options.defaultEncoding || DEFAULT_ENCODING;
     var minConfidence = options.minConfidence || MIN_CONFIDENCE;
-    var ret = jschardet.detect(buffer), encoding = ret.encoding === 'ascii' ? 'utf-8' : ret.encoding,
-        confidence = ret.confidence;
+    var ret = jschardet.detect(buffer),
+      encoding = ret.encoding === 'ascii' ?
+      'utf-8' :
+      ret.encoding,
+      confidence = ret.confidence;
     // var VALID_ENCODINGS = ['gb2312', 'gbk', 'utf-8', 'big5', 'euc-kr','euc-jp'];
 
     if (encoding === null || !iconv.encodingExists(encoding) || confidence < minConfidence) {
-        return verbose ? {
-            encoding: defaultEncoding,
-            oriEncoding: encoding,
-            confidence: confidence
-        } : defaultEncoding;
+      return verbose ?
+        {
+          encoding: defaultEncoding,
+          oriEncoding: encoding,
+          confidence: confidence
+        } :
+        defaultEncoding;
     } else {
-        encoding = encoding.toUpperCase();
-        return verbose ? {
-            encoding: encoding,
-            oriEncoding: encoding,
-            confidence: confidence
-        } : encoding;
+      encoding = encoding.toUpperCase();
+      return verbose ?
+        {
+          encoding: encoding,
+          oriEncoding: encoding,
+          confidence: confidence
+        } :
+        encoding;
     }
   }
 

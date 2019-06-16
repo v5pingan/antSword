@@ -19,10 +19,10 @@ class Menubar {
       if (argv instanceof Array && argv.length === 2) {
         cmd = argv[0];
         arg = argv[1];
-      }else{
+      } else {
         cmd = argv;
       }
-      switch(cmd) {
+      switch (cmd) {
         case 'tabbar-next':
           antSword['tabbar'].goToNextTab();
           break;
@@ -31,13 +31,19 @@ class Menubar {
           break;
         case 'tabbar-close':
           const tab = antSword['tabbar'].getActiveTab();
-          if (tab === 'tab_shellmanager') { return };
-          antSword['tabbar'].tabs(tab).close();
+          if (tab === 'tab_shellmanager') {
+            return
+          };
+          antSword['tabbar']
+            .tabs(tab)
+            .close();
           break;
         default:
           // 检测是否有注册事件？执行注册事件：忽略
           let caller = this.events[cmd];
-          if (caller instanceof Function) { caller() };
+          if (caller instanceof Function) {
+            caller()
+          };
       }
     });
   }

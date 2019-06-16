@@ -11,14 +11,13 @@
 class Tabbar {
   constructor(opts) {
     // 生成一个随机ID，用于指定唯一的面板
-    let id = 'tabbar_' + (Math.random() * +new Date).toString(16).replace('.', '').substr(0,11);
+    let id = 'tabbar_' + (Math.random() * +new Date)
+      .toString(16)
+      .replace('.', '')
+      .substr(0, 11);
     let tabbar = antSword['tabbar'];
     // 添加面板对象
-    tabbar.addTab(
-      id,
-      '<i class="fa fa-puzzle-piece"></i>',
-      null, null, true, true
-    );
+    tabbar.addTab(id, '<i class="fa fa-puzzle-piece"></i>', null, null, true, true);
     this.cell = tabbar.tabs(id);
   }
 
@@ -28,7 +27,9 @@ class Tabbar {
    * @return {Object}           this
    */
   active() {
-    this.cell.setActive();
+    this
+      .cell
+      .setActive();
     return this;
   }
 
@@ -37,7 +38,9 @@ class Tabbar {
    * @return {Object} this
    */
   close() {
-    this.cell.close();
+    this
+      .cell
+      .close();
     return this;
   }
 
@@ -47,7 +50,9 @@ class Tabbar {
    * @return {Object}           this
    */
   setTitle(title = 'New Title') {
-    this.cell.setText(`<i class="fa fa-puzzle-piece"></i> ${title}`);
+    this
+      .cell
+      .setText(`<i class="fa fa-puzzle-piece"></i> ${antSword.noxss(title)}`);
     return this;
   }
 
@@ -57,15 +62,21 @@ class Tabbar {
    * @param  {String} html = "" [description]
    * @return {Object}           this
    */
-  safeHTML(html = "") {
-    let _html = new Buffer(html).toString('base64');
+  safeHTML(html = "", sandbox = "") {
+    let _html = Buffer
+      .from(html)
+      .toString('base64');
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
     let _iframe = `
       <iframe
+        sandbox="${sandbox}"
         src="data:text/html;base64,${_html}"
         style="width:100%;height:100%;border:0;padding:0;margin:0;">
       </iframe>
     `;
-    this.cell.attachHTMLString(_iframe);
+    this
+      .cell
+      .attachHTMLString(_iframe);
     return this;
   }
 
@@ -75,7 +86,9 @@ class Tabbar {
    * @return {Object}           this
    */
   showLoading(loading = true) {
-    this.cell[loading ? 'progressOn' : 'progressOff']();
+    this.cell[loading ?
+      'progressOn' :
+      'progressOff']();
     return this;
   }
 }

@@ -10,8 +10,13 @@
 // 添加源码目录到全局模块加载变量，以提供后边加载
 const path = require('path');
 const Module = require('module').Module;
-const {remote} = require('electron');
-Module.globalPaths.push(path.join(remote.process.env.AS_WORKDIR, 'source'));
+const {
+  remote
+} = require('electron');
+
+Module
+  .globalPaths
+  .push(path.join(remote.process.env.AS_WORKDIR, 'source'));
 
 // 开始加载时间
 let APP_START_TIME = +new Date;
@@ -22,39 +27,40 @@ window.addEventListener('load', () => {
    * @param  {String} format 格式化字符串，如yyyy/mm/dd hh:ii:ss
    * @return {String}        格式化完毕的字符串
    */
-  Date.prototype.format = function(format) {
+  Date.prototype.format = function (format) {
     let o = {
-      "M+" : this.getMonth()+1,
-      "d+" : this.getDate(),
-      "h+" : this.getHours(),
-      "m+" : this.getMinutes(),
-      "s+" : this.getSeconds(),
-      "q+" : Math.floor((this.getMonth()+3)/3),
-      "S" : this.getMilliseconds()
+      "M+": this.getMonth() + 1,
+      "d+": this.getDate(),
+      "h+": this.getHours(),
+      "m+": this.getMinutes(),
+      "s+": this.getSeconds(),
+      "q+": Math.floor((this.getMonth() + 3) / 3),
+      "S": this.getMilliseconds()
     }
-    if(/(y+)/.test(format)) {
-      format=format.replace(RegExp.$1, (this.getFullYear()+"").substr(4- RegExp.$1.length))
+    if (/(y+)/.test(format)) {
+      format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length))
     };
-    for(let k in o) {
-      if(new RegExp("("+ k +")").test(format)) {
-        format = format.replace(RegExp.$1, RegExp.$1.length==1? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+    for (let k in o) {
+      if (new RegExp("(" + k + ")").test(format)) {
+        format = format.replace(RegExp.$1, RegExp.$1.length == 1 ?
+          o[k] :
+          ("00" + o[k]).substr(("" + o[k]).length));
       }
     }
     return format;
   }
 
-  Array.prototype.unique = function(){
+  Array.prototype.unique = function () {
     var res = [];
     var json = {};
-    for(var i = 0; i < this.length; i++){
-      if(!json[this[i]]){
+    for (var i = 0; i < this.length; i++) {
+      if (!json[this[i]]) {
         res.push(this[i]);
         json[this[i]] = 1;
       }
     }
     return res;
   }
-
 
   /**
    * 加载JS函数
@@ -66,7 +72,9 @@ window.addEventListener('load', () => {
       let script = document.createElement('script');
       script.src = js;
       script.onload = res;
-      document.head.appendChild(script);
+      document
+        .head
+        .appendChild(script);
     });
   }
 
@@ -81,7 +89,9 @@ window.addEventListener('load', () => {
       style.rel = 'stylesheet';
       style.href = css;
       style.onload = res;
-      document.head.appendChild(style);
+      document
+        .head
+        .appendChild(style);
     });
   }
 
@@ -91,8 +101,11 @@ window.addEventListener('load', () => {
   function loadingUI() {
     let now = new Date();
     /** 加载圣诞节 loading 效果 */
-    if(now.getMonth()+1 == 12) {
-      document.getElementById('loading').classList.add('loading_christmas');
+    if (now.getMonth() + 1 == 12) {
+      document
+        .getElementById('loading')
+        .classList
+        .add('loading_christmas');
     }
   }
   loadingUI();
@@ -125,13 +138,14 @@ window.addEventListener('load', () => {
        * @param  {[type]} {extend: 'extend/layer.ext.js'} [description]
        * @return {[type]}          [description]
        */
-      layer.config({extend: 'extend/layer.ext.js'});
+      layer.config({
+        extend: 'extend/layer.ext.js'
+      });
       // 加载程序入口
       require('app.entry');
       // LOGO
       console.group('LOGO');
-      console.log(
-  `%c
+      console.log(`%c
           _____     _   _____                 _
          |  _  |___| |_|   __|_ _ _ ___ ___ _| |
          |     |   |  _|__   | | | | . |  _| . |
@@ -139,14 +153,9 @@ window.addEventListener('load', () => {
 
      ->| Ver: %c${antSword.package.version}%c
    -+=>| Git: %c${antSword.package.repository['url']}%c
-     -*| End: %c${+new Date - APP_START_TIME}%c/ms
+     -*| End: %c${ + new Date - APP_START_TIME}%c/ms
 
-  `,
-      'color: #F44336;', 'color: #9E9E9E;',
-      'color: #4CAF50;', 'color: #9E9E9E;',
-      'color: #2196F3;', 'color: #9E9E9E;',
-      'color: #FF9800;', 'color: #9E9E9E;'
-      );
+  `, 'color: #F44336;', 'color: #9E9E9E;', 'color: #4CAF50;', 'color: #9E9E9E;', 'color: #2196F3;', 'color: #9E9E9E;', 'color: #FF9800;', 'color: #9E9E9E;');
       APP_START_TIME = null;
       console.groupEnd();
     });

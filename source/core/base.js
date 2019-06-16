@@ -7,6 +7,8 @@
 'use strict';
 
 const iconv = require('iconv-lite');
+const NodeRSA = require('node-rsa');
+const fs = require('fs');
 
 class Base {
 
@@ -28,7 +30,7 @@ class Base {
        * @param  {Object} data 请求数据
        * @return {Object}      生成数据
        */
-      default(pwd, data) {
+      default (pwd, data) {
         data[pwd] = data['_'];
         delete data['_'];
         return data;
@@ -42,19 +44,42 @@ class Base {
       random(pwd, data) {
         let _encoders = [];
         for (let _ in this) {
-          if (_ === 'random') { continue }
+          if (_ === 'random') {
+            continue
+          }
           _encoders.push(_);
         }
         let _index = parseInt(Math.random() * _encoders.length);
-        return this[
-          _encoders[_index]
-        ](pwd, data);
+        return this[_encoders[_index]](pwd, data);
       }
     }
+    this['__decoder__'] = {}
     // 解析自定义编码器
-    this.user_encoders.map((_)=>{
-      this.parseEncoder(`${_}`);
-    });
+    this
+      .user_encoders
+      .map((_) => {
+        this.parseEncoder(`${_}`);
+      });
+    this
+      .user_decoders
+      .map((_) => {
+        this.parseDecoder(`${_}`);
+      });
+  }
+
+  /**
+   * 返回 RSA 对象
+   * @return {Object}
+   */
+  rsaEncrypt() {
+    let key = new NodeRSA();
+    try {
+      let priKey = fs.readFileSync(path.join(remote.process.env.AS_WORKDIR, `antData/key_rsa`));
+      if (priKey.length > 0) {
+        key.importKey(priKey.toString(), 'private');
+      }
+    } catch (e) {}
+    return key;
   }
 
   /**
@@ -63,11 +88,17 @@ class Base {
    */
   argv() {
     // 生成一个随机的变量名
-    let random = () => `0x${(Math.random() + Math.random()).toString(16).substr(2)}`;
+    let random = () => `0x${ (Math.random() + Math.random())
+      .toString(16)
+      .substr(2)}`;
     // 返回六个随机变量名数组
     return [
-      random(), random(), random(),
-      random(), random(), random()
+      random(),
+      random(),
+      random(),
+      random(),
+      random(),
+      random()
     ];
   }
 
@@ -85,9 +116,7 @@ class Base {
        * @return {String}     编码后的字符串
        */
       base64(str) {
-        return new Buffer(
-          iconv.encode(new Buffer(str), encode)
-        ).toString('base64');
+        return Buffer.from(iconv.encode(Buffer.from(str), encode)).toString('base64');
       },
       /**
        * 字符串转16进制（不进行编码转换
@@ -95,7 +124,10 @@ class Base {
        * @return {Buffer}     转换完成的buffer
        */
       buffer(str) {
-        return new Buffer(str).toString('hex').toUpperCase();
+        return Buffer
+          .from(str)
+          .toString('hex')
+          .toUpperCase();
       },
       /**
        * 字符串转16进制（进行编码转换
@@ -103,9 +135,9 @@ class Base {
        * @return {Buffer}     转换完成的buffer
        */
       hex(str) {
-        return new Buffer(
-          iconv.encode(new Buffer(str), encode)
-        ).toString('hex').toUpperCase();
+        return Buffer.from(iconv.encode(Buffer.from(str), encode))
+          .toString('hex')
+          .toUpperCase();
       }
     }
   }
@@ -121,56 +153,52 @@ class Base {
     this[templateName] = {};
     // 加载模板
     let _argv = this.argv();
-    let templateObj = require(`${tpl}`)(
-      _argv[0], _argv[1], _argv[2],
-      _argv[3], _argv[4], _argv[5]
-    );
+    let templateObj = require(`${tpl}`)(_argv[0], _argv[1], _argv[2], _argv[3], _argv[4], _argv[5]);
     // let formatter = new this.format(this.__opts__['encode']);
-    let formatter = Base.prototype.format(this.__opts__['encode']);
+    let formatter = Base
+      .prototype
+      .format(this.__opts__['encode']);
     // 解析模板
     for (let funcName in templateObj) {
-      this[templateName][funcName] = (
-        (args) => {
-          if (typeof(args) === 'object') {
-            // 如果脚本函数需要参数，则进行解析
-            return (argv) => {
-              let data = {};
-              // 克隆源数据到返回数据中
-              for (let _ in args) {
-                data[_] = args[_];
-              }
-              // 循环替换脚本中的标签
-              for (let arg in args) {
-                (args[arg].match(/#{([\w\:]+)}/g) || []).map(
-                  // example: #{hex::str} = hex(str), #{arg1} = arg1
-                  (tag) => {
-                    let tagStr = tag.substr(2, tag.length - 3);
-                    let tagArr = tagStr.split('::');
-                    let func, retStr;
-                    if (
-                      (tagArr.length > 0) &&
-                      (func = formatter[tagArr[0]])
-                    ) {
-                      // 如果包含有分割标签且该格式化函数存在，则调用该函数进行处理
-                      retStr = func( argv[tagArr[1] || ''] );
-                    } else {
-                      // 否则替换直接返回字符串
-                      retStr = argv[tagStr] || '';
-                    }
-                    // 组合最终生成模板代码
-                    data[arg] = data[arg].replace(tag, retStr);
-                  }
-                )
-              }
-              // 发送HTTP请求
-              return data;
+      this[templateName][funcName] = ((args) => {
+        if (typeof (args) === 'object') {
+          // 如果脚本函数需要参数，则进行解析
+          return (argv) => {
+            let data = {};
+            // 克隆源数据到返回数据中
+            for (let _ in args) {
+              data[_] = args[_];
             }
-          } else {
-            // 否则直接返回
-            return () => ({ _: args });
+            // 循环替换脚本中的标签
+            for (let arg in args) {
+              (args[arg].match(/#{([\w\:]+)}/g) || []).map(
+                // example: #{hex::str} = hex(str), #{arg1} = arg1
+                (tag) => {
+                  let tagStr = tag.substr(2, tag.length - 3);
+                  let tagArr = tagStr.split('::');
+                  let func,
+                    retStr;
+                  if ((tagArr.length > 0) && (func = formatter[tagArr[0]])) {
+                    // 如果包含有分割标签且该格式化函数存在，则调用该函数进行处理
+                    retStr = func(argv[tagArr[1] || '']);
+                  } else {
+                    // 否则替换直接返回字符串
+                    retStr = argv[tagStr] || '';
+                  }
+                  // 组合最终生成模板代码
+                  data[arg] = data[arg].replace(tag, retStr);
+                })
+            }
+            // 发送HTTP请求
+            return data;
           }
+        } else {
+          // 否则直接返回
+          return () => ({
+            _: args
+          });
         }
-      )(templateObj[funcName]);
+      })(templateObj[funcName]);
     }
   }
 
@@ -185,7 +213,18 @@ class Base {
     // https://github.com/AntSwordProject/antSword/issues/135#issuecomment-475842870
     delete require.cache[require.resolve(`${enc}`)];
     // QAQ！我也不知道为什么，如果直接require变量名，babel编译就会warning，so我只好加个`咯～
-    this['__encoder__'][enc.indexOf(`encoder/`) > -1 ? enc.split(`encoder/`)[1]:enc.split(`encoder\\`)[1]] = require(`${enc}`);
+    this['__encoder__'][enc.indexOf(`encoder/`) > -1 ?
+      enc.split(`encoder/`)[1] :
+      enc.split(`encoder\\`)[1]
+    ] = require(`${enc}`);
+  }
+
+  parseDecoder(dec) {
+    delete require.cache[require.resolve(`${dec}`)];
+    this['__decoder__'][dec.indexOf(`decoder/`) > -1 ?
+      dec.split(`decoder/`)[1] :
+      dec.split(`decoder\\`)[1]
+    ] = require(`${dec}`);
   }
 
   /**
@@ -196,11 +235,12 @@ class Base {
    * @return {Object}       最终生成数据// 将返回三个参数对象：tag_s,tag_e,data
    */
   encodeComplete(tag_s, tag_e, data) {
+    let ext = {
+      opts: this.__opts__,
+      rsa: this.rsaEncrypt()
+    }
     // 编码器处理
-    let finalData = this.__encoder__[this.__opts__['encoder']](
-      this.__opts__['pwd'],
-      data
-    );
+    let finalData = this.__encoder__[this.__opts__['encoder']](this.__opts__['pwd'], data, ext);
     return {
       'tag_s': tag_s,
       'tag_e': tag_e,
@@ -217,22 +257,42 @@ class Base {
    */
   request(code, chunkCallBack) {
     const opt = this.complete(code);
+    let ext = {
+      opts: this.__opts__,
+      rsa: this.rsaEncrypt()
+    }
     return new Promise((res, rej) => {
       // 随机ID(用于监听数据来源)
-      const hash = (String(+new Date) + String(Math.random())).substr(10, 10).replace('.', '_');
+      const hash = (String(+new Date) + String(Math.random()))
+        .substr(10, 10)
+        .replace('.', '_');
       // 监听数据返回
       antSword['ipcRenderer']
         // 请求完毕返回数据{text,buff}
         .once(`request-${hash}`, (event, ret) => {
+          let buff = this.__decoder__[this.__opts__['decoder'] || 'default'].decode_buff(ret['buff'], ext);
+          let encoding = antSword
+            .Decodes
+            .detectEncoding(buff, {
+              defaultEncoding: "unknown"
+            });
+          encoding = encoding != "unknown" ?
+            encoding :
+            this.__opts__['encode'];
+          let text = antSword
+            .Decodes
+            .decode(buff, encoding);
           return res({
-            'encoding': ret['encoding']||"",
-            'text': ret['text'],
-            'buff': ret['buff']
+            'encoding': encoding || "",
+            'text': text,
+            'buff': buff
           });
         })
         // HTTP请求返回字节流
         .on(`request-chunk-${hash}`, (event, ret) => {
-          return chunkCallBack ? chunkCallBack(ret) : null;
+          return chunkCallBack ?
+            chunkCallBack(this.__decoder__[this.__opts__['decoder'] || 'default'].decode_buff(ret)) :
+            null;
         })
         // 数据请求错误
         .once(`request-error-${hash}`, (event, ret) => {
@@ -266,10 +326,12 @@ class Base {
    * @return {Promise}                  Promise操作对象
    */
   download(savePath, postCode, progressCallback) {
-    const opt = this.complete(postCode);
+    const opt = this.complete(postCode, true);
     return new Promise((ret, rej) => {
       // 随机ID(用于监听数据来源)
-      const hash = (String(+new Date) + String(Math.random())).substr(10, 10).replace('.', '_');
+      const hash = (String(+new Date) + String(Math.random()))
+        .substr(10, 10)
+        .replace('.', '_');
       // 监听数据返回
       antSword['ipcRenderer']
         // 请求完毕返回数据(size)
@@ -278,7 +340,9 @@ class Base {
         })
         // HTTP请求返回字节流大小
         .on(`download-progress-${hash}`, (event, size) => {
-          return progressCallback ? progressCallback(size) : null;
+          return progressCallback ?
+            progressCallback(size) :
+            null;
         })
         // 数据请求错误
         .once(`download-error-${hash}`, (event, ret) => {

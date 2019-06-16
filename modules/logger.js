@@ -21,8 +21,12 @@ class Logger {
    * @return {String}      格式化后的内容文本
    */
   parseLog(type, logs) {
-    let tm = new Date().toTimeString().split(' ')[0];
-    let log = typeof logs === 'object' ? JSON.stringify(logs) : String(logs);
+    let tm = new Date()
+      .toTimeString()
+      .split(' ')[0];
+    let log = typeof logs === 'object' ?
+      JSON.stringify(logs) :
+      String(logs);
     return `[${tm}] ${type.toUpperCase()}::${this.tag}\t${log}`;
   }
 
@@ -31,7 +35,10 @@ class Logger {
    * @return {[type]} [description]
    */
   debug() {
-    mainWindow.send('logger-debug', [this.parseLog('debug', arguments), arguments]);
+    mainWindow.send('logger-debug', [
+      this.parseLog('debug', arguments),
+      arguments
+    ]);
   }
 
   /**
@@ -39,7 +46,10 @@ class Logger {
    * @return {[type]} [description]
    */
   info() {
-    mainWindow.send('logger-info', [this.parseLog('info', arguments), arguments]);
+    mainWindow.send('logger-info', [
+      this.parseLog('info', arguments),
+      arguments
+    ]);
   }
 
   /**
@@ -47,7 +57,10 @@ class Logger {
    * @return {[type]} [description]
    */
   warn() {
-    mainWindow.send('logger-warn', [this.parseLog('warn', arguments), arguments]);
+    mainWindow.send('logger-warn', [
+      this.parseLog('warn', arguments),
+      arguments
+    ]);
   }
 
   /**
@@ -55,7 +68,10 @@ class Logger {
    * @return {[type]} [description]
    */
   fatal() {
-    mainWindow.send('logger-fatal', [this.parseLog('fatal', arguments), arguments]);
+    mainWindow.send('logger-fatal', [
+      this.parseLog('fatal', arguments),
+      arguments
+    ]);
   }
 }
 

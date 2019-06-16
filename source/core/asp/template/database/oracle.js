@@ -5,8 +5,7 @@
 module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   // 显示所有数据库
   show_databases: {
-    _:
-      `Set Conn=Server.CreateObject("Adodb.connection"):
+    _: `Set Conn=Server.CreateObject("Adodb.connection"):
       Dim SI:
       Conn.Open bd(Request("${arg1}")):
       If Err Then:
@@ -32,8 +31,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示数据库所有表
   show_tables: {
-    _:
-      `Set Conn=Server.CreateObject("Adodb.connection"):
+    _: `Set Conn=Server.CreateObject("Adodb.connection"):
       Dim SI:
       Conn.Open ""&bd(Request("${arg1}"))&"":
       If Err Then:
@@ -60,8 +58,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示表字段
   show_columns: {
-    _:
-      `Set Conn=Server.CreateObject("Adodb.connection"):
+    _: `Set Conn=Server.CreateObject("Adodb.connection"):
       Dim SI:
       Conn.Open ""&bd(Request("${arg1}"))&"":
       If Err Then:
@@ -86,14 +83,13 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
         Conn.Close:
       End If:
       Set Conn=Nothing:
-      Response.Write(SI)`.replace(/\n\s+/g,''),
+      Response.Write(SI)`.replace(/\n\s+/g, ''),
     [arg1]: '#{hex::conn}',
     [arg2]: '#{hex::table}'
   },
   // 执行SQL语句
   query: {
-    _:
-      `Set Conn=Server.CreateObject("Adodb.connection"):
+    _: `Set Conn=Server.CreateObject("Adodb.connection"):
       Conn.Open ""&bd(Request("${arg1}"))&"":
       Dim CO,HD,RN:CO=chr(9)&chr(124)&chr(9):
       RN=chr(13)&chr(10):

@@ -16,17 +16,31 @@ class Language {
 
     // 工具栏
     const toolbar = cell.attachToolbar();
-    toolbar.loadStruct([
-      { id: 'save', type: 'button', text: LANG['toolbar']['save'], icon: 'save' },
-      { type: 'separator' }
-    ]);
+    toolbar.loadStruct([{
+      id: 'save',
+      type: 'button',
+      text: LANG['toolbar']['save'],
+      icon: 'save'
+    }, {
+      type: 'separator'
+    }]);
 
     // 表单
     const _language = antSword['storage']('language', false, 'en');
-    const form = cell.attachForm([
-      { type: 'settings', position: 'label-left', labelWidth: 100, inputWidth: 150 },
-      { type: 'block', inputWidth: 'auto', offsetTop: 12, list: [
-        { type: 'combo', label: LANG['form']['label'], readonly: true, name: 'language',
+    const form = cell.attachForm([{
+      type: 'settings',
+      position: 'label-left',
+      labelWidth: 100,
+      inputWidth: 150
+    }, {
+      type: 'block',
+      inputWidth: 'auto',
+      offsetTop: 12,
+      list: [{
+        type: 'combo',
+        label: LANG['form']['label'],
+        readonly: true,
+        name: 'language',
         options: (() => {
           let _ = [];
           for (let l in antSword['language']['__languages__']) {
@@ -37,13 +51,13 @@ class Language {
             });
           }
           return _;
-        })() }
-      ]}
-    ], true);
+        })()
+      }]
+    }], true);
 
     // 工具栏点击事件
     toolbar.attachEvent('onClick', (id) => {
-      switch(id) {
+      switch (id) {
         case 'save':
           const language = form.getValues()['language'];
           // 保存设置
@@ -51,7 +65,8 @@ class Language {
           toastr.success(LANG['success'], LANG_T['success']);
           // 重启应用
           layer.confirm(LANG['confirm']['content'], {
-            icon: 2, shift: 6,
+            icon: 2,
+            shift: 6,
             title: LANG['confirm']['title']
           }, (_) => {
             location.reload();

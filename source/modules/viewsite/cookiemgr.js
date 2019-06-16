@@ -12,10 +12,14 @@ const CM = {
    */
   get: (opt = {}) => {
     return new Promise((res, rej) => {
-      CM.cookies.get(opt, (err, _cookies) => {
-        if (err) { return rej(err) }
-        return res(_cookies);
-      })
+      CM
+        .cookies
+        .get(opt, (err, _cookies) => {
+          if (err) {
+            return rej(err)
+          }
+          return res(_cookies);
+        })
     })
   },
   /**
@@ -25,16 +29,18 @@ const CM = {
    */
   getStr: (opt = {}) => {
     return new Promise((res, rej) => {
-      CM.cookies.get(opt, (err, _cookies) => {
-        if (err) { return rej(err) }
-        let _cs = [];
-        _cookies.map((_) => {
-          _cs.push(
-            _['name'] + '=' + _['value']
-          )
-        });
-        return res(_cs.join('; '));
-      })
+      CM
+        .cookies
+        .get(opt, (err, _cookies) => {
+          if (err) {
+            return rej(err)
+          }
+          let _cs = [];
+          _cookies.map((_) => {
+            _cs.push(_['name'] + '=' + _['value'])
+          });
+          return res(_cs.join('; '));
+        })
     })
   }
 }

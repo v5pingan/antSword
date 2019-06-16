@@ -2,10 +2,8 @@
 // 设置模块
 //
 
-// import About from './about';
-// import Update from './update';
-// import Language from './language';
-// import AProxy from './aproxy'
+// import About from './about'; import Update from './update'; import Language
+// from './language'; import AProxy from './aproxy';
 const About = require('./about');
 // const Update = require('./update');
 const Language = require('./language');
@@ -18,7 +16,14 @@ class Settings {
 
   constructor() {
     antSword['menubar'].reg('settings', this.open.bind(this));
-    ['about', 'update', 'language', 'aproxy','display', 'encoders'].map((_) => {
+    [
+      'about',
+      'update',
+      'language',
+      'aproxy',
+      'display',
+      'encoders'
+    ].map((_) => {
       antSword['menubar'].reg(`settings-${_}`, this.setActive.bind(this, _));
     });
     return this;
@@ -28,13 +33,11 @@ class Settings {
     const tabbar = antSword['tabbar'];
     // 判断是否已经打开
     if (tabbar.tabs('tab_about')) {
-      return tabbar.tabs('tab_about').setActive();
+      return tabbar
+        .tabs('tab_about')
+        .setActive();
     };
-    tabbar.addTab(
-      'tab_about',
-      '<i class="fa fa-cog"></i>',
-      null, null, true, true
-    );
+    tabbar.addTab('tab_about', '<i class="fa fa-cog"></i>', null, null, true, true);
     const cell = tabbar.tabs('tab_about');
 
     const sidebar = cell.attachSidebar({
@@ -57,7 +60,10 @@ class Settings {
   // @设置当前激活项
   setActive(id) {
     this.open();
-    this.sidebar.items(id).setActive();
+    this
+      .sidebar
+      .items(id)
+      .setActive();
   }
 
 }

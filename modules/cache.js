@@ -22,7 +22,8 @@ class Cache {
    */
   constructor(electron) {
     logger = new electron.Logger('Cache');
-    electron.ipcMain
+    electron
+      .ipcMain
       .on('cache-add', this.addCache.bind(this))
       .on('cache-set', this.setCache.bind(this))
       .on('cache-get', this.getCache.bind(this))
@@ -50,12 +51,14 @@ class Cache {
    */
   addCache(event, opts) {
     logger.debug('addCache', opts);
-    this.createDB(opts['id']).insert({
-      tag: opts['tag'],
-      cache: opts['cache']
-    }, (err, ret) => {
-      event.returnValue = err || ret;
-    });
+    this
+      .createDB(opts['id'])
+      .insert({
+        tag: opts['tag'],
+        cache: opts['cache']
+      }, (err, ret) => {
+        event.returnValue = err || ret;
+      });
   }
 
   /**
@@ -65,15 +68,17 @@ class Cache {
    */
   setCache(event, opts) {
     logger.debug('setCache', opts);
-    this.createDB(opts['id']).update({
-      tag: opts['tag']
-    }, {
-      $set: {
-        cache: opts['cache']
-      }
-    }, (err, ret) => {
-      event.returnValue = err || ret;
-    });
+    this
+      .createDB(opts['id'])
+      .update({
+        tag: opts['tag']
+      }, {
+        $set: {
+          cache: opts['cache']
+        }
+      }, (err, ret) => {
+        event.returnValue = err || ret;
+      });
   }
 
   /**
@@ -84,11 +89,13 @@ class Cache {
    */
   getCache(event, opts) {
     logger.debug('getCache', opts);
-    this.createDB(opts['id']).findOne({
-      tag: opts['tag']
-    }, (err, ret) => {
-      event.returnValue = err || ret;
-    })
+    this
+      .createDB(opts['id'])
+      .findOne({
+        tag: opts['tag']
+      }, (err, ret) => {
+        event.returnValue = err || ret;
+      })
   }
 
   /**
@@ -99,11 +106,13 @@ class Cache {
    */
   delCache(event, opts) {
     logger.warn('delCache', opts);
-    this.createDB(opts['id']).remove({
-      tag: opts['tag']
-    }, (err, ret) => {
-      event.returnValue = err || ret;
-    });
+    this
+      .createDB(opts['id'])
+      .remove({
+        tag: opts['tag']
+      }, (err, ret) => {
+        event.returnValue = err || ret;
+      });
   }
 
   /**
@@ -114,10 +123,10 @@ class Cache {
    */
   clearCache(event, opts) {
     logger.fatal('clearCache', opts);
-    try{
+    try {
       fs.unlinkSync(path.join(CONF.cachePath, opts['id']));
       event.returnValue = true;
-    }catch(e) {
+    } catch (e) {
       event.returnValue = e;
     }
   }
@@ -130,12 +139,14 @@ class Cache {
    */
   clearAllCache(event, opts) {
     logger.fatal('clearAllCache', opts);
-    try{
-      fs.readdirSync(CONF.cachePath).map((_) => {
-        fs.unlinkSync(path.join(CONF.cachePath, _));
-      });
+    try {
+      fs
+        .readdirSync(CONF.cachePath)
+        .map((_) => {
+          fs.unlinkSync(path.join(CONF.cachePath, _));
+        });
       event.returnValue = true;
-    }catch(e) {
+    } catch (e) {
       event.returnValue = e;
     }
   }

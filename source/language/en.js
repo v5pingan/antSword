@@ -68,7 +68,8 @@ module.exports = {
       pluginStore: 'Plugin Store',
       clearCache: 'Clear cache',
       clearAllCache: 'Clear all cache',
-      viewsite: 'View Site'
+      viewsite: 'View Site',
+      copyurl: 'Copy URL'
     },
     category: {
       title: 'Category',
@@ -84,8 +85,8 @@ module.exports = {
       del: {
         title: 'Delete category',
         confirm: 'Are you sure to delete this category?',
-        success: (category) => antSword.noxss(`Delete category(${category}) success!`),
-        error: (category, err) => antSword.noxss(`Delete category(${category}failed!\n${err}`)
+        success: (category) => `Delete category(${category}) success!`,
+        error: (category, err) => `Delete category(${category}failed!\n${err}`
       },
       rename: {
         title: 'Rename category',
@@ -125,7 +126,7 @@ module.exports = {
         test_warning: 'Response is null!',
         warning: 'Please enter the full!',
         success: 'Add shell success!',
-        error: (err) => antSword.noxss(`Add shell failed!\n${err}`)
+        error: (err) => `Add shell failed!\n${err}`
       },
       edit: {
         title: (url) => antSword.noxss(`Edit shell(${url})`),
@@ -143,29 +144,29 @@ module.exports = {
         },
         warning: 'Please enter the full!',
         success: 'Update shell success!',
-        error: (err) => antSword.noxss(`Update shell failed!\n${err}`)
+        error: (err) => `Update shell failed!\n${err}`
       },
       del: {
         title: 'Delete shell',
         confirm: (len) => antSword.noxss(`Are you sure to delete ${len} shells?`),
-        success: (len) => antSword.noxss(`Delete ${len} shells success!`),
-        error: (err) => antSword.noxss(`Delete failed!\n${err}`)
+        success: (len) => `Delete ${len} shells success!`,
+        error: (err) => `Delete failed!\n${err}`
       },
       move: {
-        success: (num) => antSword.noxss(`Move ${num}datas success!`),
-        error: (err) => antSword.noxss(`Move data failed!\n${err}`)
+        success: (num) => `Move ${num}datas success!`,
+        error: (err) => `Move data failed!\n${err}`
       },
       clearCache: {
         title: 'Clear cache',
         confirm: 'Are you sure to clear this cache?',
         success: 'Clear cache success!',
-        error: (err) => antSword.noxss(`Clear cache failed!\n${err}`)
+        error: (err) => `Clear cache failed!\n${err}`
       },
       clearAllCache: {
         title: 'Clear all cache',
         confirm: 'Are you sure to clear all the cache?',
         success: 'Clear all cache success!',
-        error: (err) => antSword.noxss(`Clear all cache failed!\n${err}`)
+        error: (err) => `Clear all cache failed!\n${err}`
       },
       accordion: {
         base: 'Base',
@@ -180,7 +181,10 @@ module.exports = {
           usechunk: 'Use Chunked send payload.',
           min: 'Min Block',
           max: 'Max Block',
-          exphint: 'This feature is currently experimental and cannot be used with Multipart. Some types of servers may not support Chunked transfers. In addition, it is recommended to set the timeout period to 30s or more to avoid data transmission when the network speed is not good.',
+          exphint: 'This feature is currently experimental and cannot be used with Multipart. Some t' +
+            'ypes of servers may not support Chunked transfers. In addition, it is recommende' +
+            'd to set the timeout period to 30s or more to avoid data transmission when the n' +
+            'etwork speed is not good.'
         },
         terminalCache: "Use the terminal's cache",
         filemanagerCache: "Use the filemanager's cache",
@@ -227,49 +231,65 @@ Hot Keys:
       ascmd: (cmd) => antSword.noxss(`Will execute the command with ${cmd}.`),
       aspowershell: {
         on: "Powershell mode enabled",
-        off: "Powershell mode disabled",
-      },
-    },
+        off: "Powershell mode disabled"
+      }
+    }
   },
   filemanager: {
     title: 'FileManager',
     delete: {
       title: 'Delete',
-      confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number' ? num + ' files' : num} ?`),
-      success: (path) => antSword.noxss(`Delete file [${path}] success!`),
-      error: (path, err) => antSword.noxss(`Delete file [${path}] failed!${err ? '\n' + err : ''}`)
+      confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+        ? num + ' files'
+        : num} ?`),
+      success: (path) => `Delete file [${path}] success!`,
+      error: (path, err) => `Delete file [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     paste: {
-      success: (path) => antSword.noxss(`Paste file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Paste file [${path}] failed!${err ? '\n' + err : ''}`)
+      success: (path) => `Paste file success!\n${path}`,
+      error: (path, err) => `Paste file [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     rename: {
       title: 'Rename',
       success: 'Rename success!',
-      error: (err) => antSword.noxss(`Rename failed!${err ? '\n' + err : ''}`)
+      error: (err) => `Rename failed!${err
+        ? '\n' + err
+        : ''}`
     },
     createFolder: {
       title: 'Create Folder',
       value: 'New Folder',
-      success: (path) => antSword.noxss(`Create folder success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Create folder [${path}] failed!${err ? '\n' + err : ''}`)
+      success: (path) => `Create folder success!\n${path}`,
+      error: (path, err) => `Create folder [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     createFile: {
       title: 'Create File',
       value: 'New File.txt',
-      success: (path) => antSword.noxss(`Create file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Create file [${path}] failed!${err ? '\n' + err : ''}`)
+      success: (path) => `Create file success!\n${path}`,
+      error: (path, err) => `Create file [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     retime: {
       title: 'Retime File',
-      success: (path) => antSword.noxss(`Retime file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Retime file [${path}] failed!${err ? '\n' + err : ''}`)
+      success: (path) => `Retime file success!\n${path}`,
+      error: (path, err) => `Retime file [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     chmod: {
       title: 'Chmod File',
       check: 'Input should be octal numbers, eg: 0644',
-      success: (path) => antSword.noxss(`Chmod file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Chmod file [${path}] failed!${err ? '\n' + err : ''}`)
+      success: (path) => `Chmod file success!\n${path}`,
+      error: (path, err) => `Chmod file [${path}] failed!${err
+        ? '\n' + err
+        : ''}`
     },
     wget: {
       title: 'Wget File',
@@ -278,8 +298,8 @@ Hot Keys:
         name: 'WGET',
         start: 'Start to wget file..',
         success: 'Wget success!',
-        failed: (ret) => antSword.noxss(`Failed:${ret}`),
-        error: (err) => antSword.noxss(`Error:${err}`)
+        failed: (ret) => `Failed:${ret}`,
+        error: (err) => `Error:${err}`
       }
     },
     upload: {
@@ -289,11 +309,11 @@ Hot Keys:
         httperr_413: 'Please lower the upload file shard size setting.',
         httperr_etime: 'Request timeout, please increase the timeout period.',
         httperr_econnrefused: 'Connection refused, check target or proxy is enabled.',
-        failed: (err) => antSword.noxss(`Failed:${err}`),
-        error: (err) => antSword.noxss(`Error:${err}`)
+        failed: (err) => `Failed:${err}`,
+        error: (err) => `Error:${err}`
       },
-      success: (path) => antSword.noxss(`Upload file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Upload file [${path}] failed!${err}`),
+      success: (path) => `Upload file success!\n${path}`,
+      error: (path, err) => `Upload file [${path}] failed!${err}`
     },
     folder: {
       title: 'Folders'
@@ -320,7 +340,7 @@ Hot Keys:
       prompt: {
         add: {
           title: 'Add to bookmark',
-          success: (path) => antSword.noxss(`Add to bookmark success!\n${path}`),
+          success: (path) => `Add to bookmark success!\n${path}`
         },
         remove: {
           title: 'Remove bookmark',
@@ -353,7 +373,7 @@ Hot Keys:
           edit: {
             title: 'Edit',
             openwindow: 'Open in Window',
-            opentab: 'Open in Tab',
+            opentab: 'Open in Tab'
           },
           delete: 'Delete',
           rename: 'Rename',
@@ -369,8 +389,8 @@ Hot Keys:
             copypath: 'Copy FilePath',
             copysuccess: 'Copy to clipboard successfully!',
             copyfail: 'Copy to clipboard failed!',
-            warning: (id) => antSword.noxss(`Already add to clipboard!\n${id}`),
-            info: (id) => antSword.noxss(`Add file to the clipboard.\n${id}`)
+            warning: (id) => `Already add to clipboard!\n${id}`,
+            info: (id) => `Add file to the clipboard.\n${id}`
           },
           create: {
             title: 'Create',
@@ -388,9 +408,9 @@ Hot Keys:
         mode: 'Mode',
         encode: 'Open with Encoding'
       },
-      loadErr: (err) => antSword.noxss(`Load file error!\n${err}`),
-      success: (path) => antSword.noxss(`Save the file success!\n${path}`),
-      error: (path, err) => antSword.noxss(`Save the file [${path}] failed!${err}`)
+      loadErr: (err) => `Load file error!\n${err}`,
+      success: (path) => `Save the file success!\n${path}`,
+      error: (path, err) => `Save the file [${path}] failed!${err}`
     },
     tasks: {
       title: 'Tasks',
@@ -412,10 +432,10 @@ Hot Keys:
         cancel: 'Cancel download',
         start: 'Start to download',
         success: 'Download success!',
-        error: (err) => antSword.noxss(`Error:${err}`)
+        error: (err) => `Error:${err}`
       },
-      error: (name, err) => antSword.noxss(`Download file [${name}]error!\n${err}`),
-      success: (name) => antSword.noxss(`Download file [${name}] success!`)
+      error: (name, err) => `Download file [${name}]error!\n${err}`,
+      success: (name) => `Download file [${name}] success!`
     }
   },
   database: {
@@ -439,28 +459,50 @@ Hot Keys:
         deltable: 'Del Table',
         addcolumn: 'New Column',
         editcolumn: 'Edit ColumnName',
-        delcolumn: 'Del Column',
+        delcolumn: 'Del Column'
       }
     },
     query: {
       title: 'Exec SQL',
       exec: 'Run',
-      clear: 'Clear'
+      clear: 'Clear',
+      bookmark: {
+        title: 'Bookmark',
+        add: 'Add bookmark',
+        del: 'Remove this bookmark',
+        clear: 'Clear all bookmarks'
+      },
+      prompt: {
+        add: {
+          title: 'Add to bookmark',
+          success: (path) => `Add to bookmark success!\n${path}`
+        },
+        remove: {
+          title: 'Remove bookmark',
+          confirm: 'Remove this bookmark ?',
+          success: 'Remove bookmark success!'
+        },
+        clear: {
+          title: 'Clear all bookmarks',
+          confirm: 'Clear all bookmarks ?',
+          success: 'Clear all bookmark success!'
+        }
+      }
     },
     result: {
       title: 'Result',
       warning: 'Execution is completed, but no results return!',
       error: {
-        database: (err) => antSword.noxss(`Failed to obtain a list of databases!\n${err}`),
-        table: (err) => antSword.noxss(`Get table data failed!\n${err}`),
-        column: (err) => antSword.noxss(`Failed to obtain field list!\n${err}`),
-        query: (err) => antSword.noxss(`Failure to execute SQL!\n${err}`),
+        database: (err) => `Failed to obtain a list of databases!\n${err}`,
+        table: (err) => `Get table data failed!\n${err}`,
+        column: (err) => `Failed to obtain field list!\n${err}`,
+        query: (err) => `Failure to execute SQL!\n${err}`,
         parse: 'Return data format is incorrect!',
         noresult: 'No query results!'
       },
       dump: {
         title: "Export Data",
-        success: "Export success",
+        success: "Export success"
       }
     },
     notsupport: 'Not support the current database type',
@@ -486,7 +528,7 @@ Hot Keys:
         title: 'Delete configuration',
         confirm: 'Determine delete this configuration?',
         success: 'Delete configuration success!',
-        error: (err) => antSword.noxss(`Delete configuration failed!\n${err}`)
+        error: (err) => `Delete configuration failed!\n${err}`
       },
       adddb: {
         title: 'New Database',
@@ -496,7 +538,7 @@ Hot Keys:
         createbtn: 'OK',
         cancelbtn: 'Cancel',
         success: 'Create database successfully',
-        error: 'Failed to create database',
+        error: 'Failed to create database'
       },
       editdb: {
         title: 'Database Properties',
@@ -506,13 +548,13 @@ Hot Keys:
         updatebtn: 'OK',
         cancelbtn: 'Cancel',
         success: 'Edit database successfully',
-        error: 'Failed to edit database',
+        error: 'Failed to edit database'
       },
       deldb: {
         title: 'Delete Database',
         confirm: (name) => antSword.noxss(`Are you sure you want to delete database ${name} ?`),
         success: 'Delete database successfully',
-        error: 'Failed to delete database',
+        error: 'Failed to delete database'
       },
       addtable: {
         title: 'New Table',
@@ -522,46 +564,44 @@ Hot Keys:
         gridheader: "Name,Type,Length,Not Null,Key,Auto Increment",
         delete_not_select: "Please select the row you want to delete first",
         save_row_is_null: "The number of rows is empty",
-        cell_valid_error: (i,j)=>`Data format validation failed(row ${i+1}, col ${j+1})`,
+        cell_valid_error: (i, j) => `Data format validation failed(row ${i + 1}, col ${j + 1})`,
         confirmtitle: "New table name",
         invalid_tablename: "Table names should not contain special symbols",
         success: 'Create table successfully',
-        error: 'Failed to create table',
+        error: 'Failed to create table'
       },
       edittable: {
         title: "New table name",
         invalid_tablename: "Table names should not contain special symbols",
         success: 'Update table name successfully',
-        error: 'Failed to update table',
+        error: 'Failed to update table'
       },
       deltable: {
-        title:'Delete Table',
+        title: 'Delete Table',
         confirm: (name) => antSword.noxss(`Are you sure you want to delete table ${name}?`),
         success: 'Delete table successfully',
-        error: 'Failed to delete table',
+        error: 'Failed to delete table'
       },
-      addcolumn: {
-
-      },
+      addcolumn: {},
       editcolumn: {
         title: "New column name",
         invalid_tablename: "Column names should not contain special symbols",
         get_column_type_error: "Get column type error",
         success: 'Update column name successfully',
-        error: 'Failed to update column',
+        error: 'Failed to update column'
       },
       delcolumn: {
-        title:'Delete Column',
+        title: 'Delete Column',
         confirm: (name) => antSword.noxss(`Are you sure you want to delete column ${name}?`),
         success: 'Delete column successfully',
-        error: 'Failed to delete column',
+        error: 'Failed to delete column'
       }
     },
     probedb: {
       title: 'Detect database function support',
       success: 'Check completed',
       coltype: 'ConnType',
-      issupport: 'Support',
+      issupport: 'Support'
     }
   },
   settings: {
@@ -603,9 +643,11 @@ Hot Keys:
       prompt: {
         btns: {
           ok: 'Update',
-          no: 'Cancel'
+          no: 'Cancel',
+          changelog: 'ChangeLog'
         },
         body: (ver) => `Found new version v${ver}, update now?`,
+        loader_body: (ver) => `The new version of the Loader v${ver} has been released, the currently used loader will not be available, will you quit the program and go to download the latest version of the Loader?`,
         title: 'Update to version',
         changelog: 'Change Logs: ',
         sources: 'Download source: ',
@@ -615,10 +657,10 @@ Hot Keys:
         }
       },
       message: {
-        githint: (workdir)=>`The current source is Git management, please close the program and go to ${workdir} to manually update`,
+        githint: (workdir) => `The current source is Git management, please close the program and go to ${workdir} to manually update`,
         prepare: "Connecte to server...",
-        dling: (progress)=> `Downloading...${progress}%`,
-        dlingnp: (size)=> `Downloading...${size}`,
+        dling: (progress) => `Downloading...${progress}%`,
+        dlingnp: (size) => `Downloading...${size}`,
         dlend: "Download completed",
         extract: "Unpacking, don't close AntSword",
         ing: 'Downloading..',
@@ -626,40 +668,63 @@ Hot Keys:
         success: 'Update success! Please manually restart the application later!'
       }
     },
-    encoders:{
+    encoders: {
       title: 'Encoder Manager',
+      encoder: "Encoder",
+      decoder: "Decoder",
       toolbar: {
-        new: "New",
+        new: "New Encoder",
+        new_decoder: "New Decoder",
         edit: "Edit",
         delete: "Delete",
         help: "Help",
         save: "Save",
+        rsa: "RSA Config",
+        more: "Get More",
+        generate: "Generate"
       },
       grid: {
         ename: "Name",
-        etype: "Type"
+        etype: "Shell Type",
+        edtype: {
+          title: "Type",
+          encoder: "Encoder",
+          decoder: "Decoder"
+        }
       },
-      edit_win_title: "Edit Encoder",
-      delete_title: "Delete Encoder",
+      form: {
+        public_key: "Public Key",
+        private_key: "Private Key",
+        php_code: "PHP Code"
+      },
+      rsa_config_win_title: "RSA Encoder Config",
+      edit_win_title: "Edit",
+      delete_title: "Delete",
       message: {
-        ename_duplicate: "The encoder name cannot be duplicated",
+        ename_duplicate: "The name cannot be duplicated",
         rename_success: "Rename success",
-        etype_error: "Encoder type error",
+        etype_error: "Type error",
         retype_success: "Modify type success",
-        create_success: "Create encoder success",
+        create_success: "Create success",
         edit_not_select: "Please select the row you want to edit first",
         edit_only_single: "You can only edit one",
-        edit_null_value: "Encoder content can not be empty",
+        edit_null_value: "Content can not be empty",
         edit_save_success: "Save success",
         delete_not_select: "Please select the row you want to delete first",
         delete_success: "Delete success",
         ename_invalid: "Name can only contain numbers, letters, and underlines",
+        rsa_save_success: "Generate and save RSA success",
+        rsa_save_error: "Generate and save RSA error"
       },
       prompt: {
         create_encoder: "Create Encoder",
+        create_decoder: "Create Decoder"
       },
       confirm: {
-        delete: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number' ? num + ' encoders' : num}?`),
+        generate: 'Are you sure to regemerate RSA?',
+        delete: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+          ? num + ' encoders'
+          : num}?`)
       }
     },
     aproxy: {
@@ -670,7 +735,7 @@ Hot Keys:
       },
       form: {
         label: 'Configure proxy for access to the Internet',
-        mode:{
+        mode: {
           noproxy: 'Do not use agent',
           manualproxy: 'Manually set the proxy'
         },
@@ -689,7 +754,7 @@ Hot Keys:
         content: 'Restart the application to take effect, whether to restart?',
         title: 'Change proxy settings'
       },
-      prompt:{
+      prompt: {
         title: 'Enter the Test-URL',
         success: 'Connect to proxy server successfully',
         error: 'Failed to connect to the proxy server'
@@ -706,7 +771,7 @@ Hot Keys:
       toolbar: {
         save: 'Save'
       },
-      form:{
+      form: {
         shellmanager: {
           title: 'Shell Lists',
           hiddencolumns: {
@@ -730,14 +795,14 @@ Hot Keys:
         title: 'Change default settings'
       },
       toolbar: {
-        save: 'Save',
+        save: 'Save'
       },
       filemanager: {
         title: 'FileManager',
         openfileintab: {
           title: 'Open File in',
           window: 'Window',
-          tab: 'Tab',
+          tab: 'Tab'
         },
         bookmark: {
           title: 'Global Bookmark',
@@ -759,7 +824,77 @@ Hot Keys:
           },
           del: {
             title: 'Delete Bookmark',
-            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number' ? num + ' Bookmarks' : num+" "}？`),
+            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+              ? num + ' Bookmarks'
+              : num + " "}？`),
+            success: 'Delete success'
+          },
+          edit: {
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            success: 'Edit success'
+          }
+        }
+      },
+      database: {
+        title: 'Database',
+        bookmark: {
+          title: 'Global Bookmark',
+          nodata: 'No data, click the right mouse button add',
+          grid: {
+            name: 'Name',
+            path: 'SQL'
+          },
+          bmenu: {
+            add: 'Add Bookmark',
+            del: 'Del Bookmark'
+          },
+          add: {
+            title: 'Add to global SQL bookmark',
+            success: 'Add success',
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            addbtn: 'Confirm'
+          },
+          del: {
+            title: 'Delete Bookmark',
+            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+              ? num + ' Bookmarks'
+              : num + " "}？`),
+            success: 'Delete success'
+          },
+          edit: {
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            success: 'Edit success'
+          }
+        }
+      },
+      shellmanager: {
+        title: 'ShellManager',
+        header: {
+          title: 'Default HTTP Headers',
+          nodata: 'No HTTP Header data, click the right mouse button add',
+          grid: {
+            name: 'Name',
+            value: 'Vaule'
+          },
+          bmenu: {
+            add: 'Add HTTP Header',
+            del: 'Del HTTP Header'
+          },
+          add: {
+            title: 'Add HTTP Header',
+            success: 'Add success',
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            addbtn: 'Confirm'
+          },
+          del: {
+            title: 'Delete HTTP Header',
+            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+              ? num + ' Headers'
+              : num + " "}?`),
             success: 'Delete success'
           },
           edit: {
@@ -768,20 +903,56 @@ Hot Keys:
             success: 'Edit success'
           }
         },
+        body: {
+          title: 'Default HTTP Body',
+          nodata: 'No HTTP Body data, click the right mouse button add',
+          grid: {
+            name: 'Name',
+            value: 'Value'
+          },
+          bmenu: {
+            add: 'Add HTTP Body',
+            del: 'Del HTTP Body'
+          },
+          add: {
+            title: 'Add HTTP Body',
+            success: 'Add success',
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            addbtn: 'Confirm'
+          },
+          del: {
+            title: 'Delete HTTP Body',
+            confirm: (num) => antSword.noxss(`Are you sure to delete ${typeof(num) === 'number'
+              ? num + ' HTTP Body'
+              : num + " "}?`),
+            success: 'Delete success'
+          },
+          edit: {
+            namedup: 'The name cannot be duplicated',
+            name_invalid: 'Name is invalid',
+            success: 'Edit success'
+          }
+        },
+        other: {
+          nohttps: 'Ignore HTTPS certificate',
+          requestTimeout: 'Request timeout'
+        }
       }
     }
   },
   plugin: {
-    error: (err) => antSword.noxss(`Load Plugin Store failed!\n${err}`)
+    error: (err) => `Load Plugin Store failed!\n${err}`
   },
   update: {
     title: 'Found updates',
-    body: (ver) => `New version: ${ver}, view changelog`,
-
+    body: (ver) => `New version: ${ver}, view changelog`
   },
   viewsite: {
     toolbar: {
-      useproxy: (s) => `Proxy: ${s?'ON':'OFF'}`,
+      useproxy: (s) => `Proxy: ${s
+        ? 'ON'
+        : 'OFF'}`,
       save: 'Save',
       view: 'View'
     },

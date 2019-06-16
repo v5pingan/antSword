@@ -15,7 +15,9 @@ class List {
    */
   constructor(cell, top) {
     // 删除折叠按钮
-    document.getElementsByClassName('dhxlayout_arrow dhxlayout_arrow_va')[0].remove();
+    document
+      .getElementsByClassName('dhxlayout_arrow dhxlayout_arrow_va')[0]
+      .remove();
     this.cell = cell;
     this.grid = new Grid(cell, this);
 
@@ -28,7 +30,9 @@ class List {
    * @return {[type]}     [description]
    */
   updateHeader(num = 0) {
-    this.cell.setText(`<i class="fa fa-list-ul"></i> ${LANG['title']} (${num})`);
+    this
+      .cell
+      .setText(`<i class="fa fa-list-ul"></i> ${LANG['title']} (${num})`);
   }
 }
 

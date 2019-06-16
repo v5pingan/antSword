@@ -43,7 +43,7 @@ class FileManager {
       openfileintab: false,
       bookmarks: {},
     };
-    
+
     this.config = JSON.parse(antSword['storage']("adefault_filemanager", false, JSON.stringify(config)));
     this.isWin = true;
     this.path = '/';
@@ -61,7 +61,7 @@ class FileManager {
     const cache_info = this.cache.get('info');
     if (cache_info) {
       this.initUI(cache_info);
-    }else{
+    } else {
       this.cell.progressOn();
       this.core.request(
         this.core.base.info()
@@ -71,7 +71,7 @@ class FileManager {
       }).catch((err) => {
         this.cell.progressOff();
         this.cell.close();
-        toastr.error((typeof(err) === 'object') ? JSON.stringify(err) : String(err), LANG_T['error']);
+        toastr.error((typeof (err) === 'object') ? JSON.stringify(err) : String(err), LANG_T['error']);
       });
       // this.core.base.info((ret) => {
       //   this.initUI(ret);
@@ -98,7 +98,7 @@ class FileManager {
     // 判断是否为linux
     if (info_path.substr(0, 1) === '/') {
       this.isWin = false;
-    }else{
+    } else {
       // windows 盘符统一大写
       info_path = `${info_path.substr(0,1).toUpperCase()}${info_path.substr(1)}`;
       info_drive = info_drive.toUpperCase();
@@ -106,7 +106,9 @@ class FileManager {
     this.path = info_path;
     this.home = info_path;
     info_drive.split(':').map((_) => {
-      if (!_) { return };
+      if (!_) {
+        return
+      };
       this.devices.push(_ === '/' ? _ : _ + ':/');
     });
 
@@ -141,19 +143,21 @@ class FileManager {
   getFiles(p, callback) {
 
     let self = this;
-    if(self.isWin) { // 处理输入为 f:\ 这种情况
+    if (self.isWin) { // 处理输入为 f:\ 这种情况
       p = p.replace(/\\/g, '/');
-      p = p.substr(1,2) == ":/" ? `${p.substr(0,1).toUpperCase()}${p.substr(1)}` : p;
+      p = p.substr(1, 2) == ":/" ? `${p.substr(0,1).toUpperCase()}${p.substr(1)}` : p;
     }
     let path = this.changePath(p);
-    if (self.isWin){ // 处理输入为 f: 这种情况
-      path = path.substr(1,2) == ":/" ? `${path.substr(0,1).toUpperCase()}${path.substr(1)}` : path;
+    if (self.isWin) { // 处理输入为 f: 这种情况
+      path = path.substr(1, 2) == ":/" ? `${path.substr(0,1).toUpperCase()}${path.substr(1)}` : path;
     }
     let cache;
 
-    if (!path.endsWith('/')) { path += '/' };
+    if (!path.endsWith('/')) {
+      path += '/'
+    };
     this.path = path;
-    let cache_tag = 'filemanager-files-' + new Buffer(this.path).toString('base64');
+    let cache_tag = 'filemanager-files-' + Buffer.from(this.path).toString('base64');
 
     // 判断是否有缓存
     // if (cache = this.cache[path]) {
@@ -181,7 +185,7 @@ class FileManager {
       let folders = [];
       let files = [];
 
-      tmp.map( (t) => {
+      tmp.map((t) => {
         let _ = t.split('\t');
         let d = {
           name: _[0],
@@ -191,10 +195,10 @@ class FileManager {
         }
         if (_[0].endsWith('/')) {
           folders.push(d);
-        }else{
+        } else {
           files.push(d);
         }
-      } );
+      });
 
       let data = folders.concat(files);
       callback(data);
@@ -258,24 +262,24 @@ class FileManager {
     // 如果是当前目录，返回
     if (path === './') {
       return this.path;
-    // 如果是上级目录，则判断是否为最后一级？返回最后一级：返回上一级
-    }else if (path === '../') {
+      // 如果是上级目录，则判断是否为最后一级？返回最后一级：返回上一级
+    } else if (path === '../') {
       let _ = this.path.split('/');
       if (_.length === 2) {
         return _.join('/');
-      }else if (_.length > 2) {
+      } else if (_.length > 2) {
         _.pop();
         _.pop();
         _.length === 1 ? _.push('') : 0;
         return _.join('/');
-      }else{
+      } else {
         return this.path;
       }
-    // 如果是根目录，返回
-    }else if (path.startsWith('/') || path.substr(1, 2) === ':/') {
+      // 如果是根目录，返回
+    } else if (path.startsWith('/') || path.substr(1, 2) === ':/') {
       return path;
-    // 如果是相对路径，返回绝对全路径
-    }else{
+      // 如果是相对路径，返回绝对全路径
+    } else {
       return this.path + path;
     }
   }
@@ -286,7 +290,7 @@ class FileManager {
     let self = this;
 
     layer.confirm(
-      LANG['delete']['confirm'](files.length > 1 ? files.length : files[0]),
+      LANG['delete']['confirm'](files.length > 1 ? files.length : files[0]), // 已在 lang 中过滤
       {
         icon: 2,
         shift: 6,
@@ -310,7 +314,7 @@ class FileManager {
               if (ret === '1') {
                 toastr.success(LANG['delete']['success'](path), LANG_T['success']);
                 this.files.refreshPath();
-              }else{
+              } else {
                 toastr.error(LANG['delete']['error'](path, ret === '0' ? false : ret), LANG_T['error']);
               }
             }).catch((err) => {
@@ -360,7 +364,7 @@ class FileManager {
         // 删除缓存
         delete this.files.Clipboard[name];
         toastr.success(LANG['paste']['success'](name), LANG_T['success']);
-      }else{
+      } else {
         toastr.error(LANG['paste']['error'](name, ret === '0' ? false : ret), LANG_T['error']);
       }
     }).catch((err) => {
@@ -387,7 +391,7 @@ class FileManager {
         if (ret === '1') {
           this.files.refreshPath();
           toastr.success(LANG['rename']['success'], LANG_T['success']);
-        }else{
+        } else {
           toastr.error(LANG['rename']['error'](ret === '0' ? false : ret), LANG_T['error']);
         }
       }).catch((err) => {
@@ -414,7 +418,7 @@ class FileManager {
         if (ret === '1') {
           this.files.refreshPath();
           toastr.success(LANG['createFolder']['success'](value), LANG_T['success']);
-        }else{
+        } else {
           toastr.error(LANG['createFolder']['error'](value, ret === '0' ? false : ret), LANG_T['error']);
         }
       }).catch((err) => {
@@ -444,7 +448,7 @@ class FileManager {
         if (ret === '1') {
           this.files.refreshPath();
           toastr.success(LANG['createFile']['success'](value), LANG_T['success']);
-        }else{
+        } else {
           toastr.error(LANG['createFile']['error'](value, ret === '0' ? false : ret), LANG_T['error']);
         }
       }).catch((err) => {
@@ -464,7 +468,7 @@ class FileManager {
       this.files.cell.progressOn();
       let path = this.path;
       if (this.isWin) {
-          path = path.replace(/\//g, '\\')
+        path = path.replace(/\//g, '\\')
       }
       // http request
       this.core.request(
@@ -479,7 +483,7 @@ class FileManager {
         if (ret === '1') {
           this.files.refreshPath();
           toastr.success(LANG['retime']['success'](name), LANG_T['success']);
-        }else{
+        } else {
           toastr.error(LANG['retime']['error'](name, ret === '0' ? false : ret), LANG_T['error']);
         }
       }).catch((err) => {
@@ -492,10 +496,10 @@ class FileManager {
   // 设置文件和目录权限
   chmodFile(name, oldmod) {
     layer.prompt({
-      value: oldmod,
+      value: antSword.noxss(oldmod),
       title: `<i class="fa fa-users"></i> ${LANG['chmod']['title']} (${antSword.noxss(name)})`,
     }, (value, i, e) => {
-      if(!value.match(/^[0-7]{4}$/)){
+      if (!value.match(/^[0-7]{4}$/)) {
         toastr.error(LANG['chmod']['check'], LANG_T['error']);
         return
       }
@@ -516,7 +520,7 @@ class FileManager {
         if (ret === '1') {
           this.files.refreshPath();
           toastr.success(LANG['chmod']['success'](name), LANG_T['success']);
-        }else{
+        } else {
           toastr.error(LANG['chmod']['error'](name, ret === '0' ? false : ret), LANG_T['error']);
         }
       }).catch((err) => {
@@ -531,38 +535,38 @@ class FileManager {
     let that = this;
     const remote_path = this.path + name;
     const win = that.createWin({
-      title: 'Loading File: ' + remote_path,
+      title: 'Loading File: ' + antSword.noxss(remote_path),
       width: 800,
       height: 600,
     });
     var filemime = mime.lookup(name);
-    let savepath = PATH.join(process.env.AS_WORKDIR,`antData/.temp/`,new Buffer(name).toString("hex"));
+    let savepath = PATH.join(process.env.AS_WORKDIR, `antData/.temp/`, Buffer.from(name).toString("hex"));
     win.cell.lastChild['style']['overflow'] = 'scroll';
     win.cell.lastChild['style']['textAlign'] = 'center';
 
     let down_size = 0;
     this.core.download(
-      savepath
-      ,this.core.filemanager.download_file({path: remote_path})
-      , (_size) => {
+      savepath, this.core.filemanager.download_file({
+        path: remote_path
+      }), (_size) => {
         down_size += _size;
         let down_progress = parseInt(parseFloat(down_size / size).toFixed(2) * 100);
         if (!(down_progress % 5)) {
-          win.setText(`Preview File: ${remote_path} ${down_progress}%`);
+          win.setText(`Preview File: ${antSword.noxss(remote_path)} ${down_progress}%`);
         };
       }
     ).then((_size) => {
       if (_size === size) {
-        win.setText(`Preview File: ${remote_path}`);
+        win.setText(`Preview File: ${antSword.noxss(remote_path)}`);
         let buff = fs.readFileSync(savepath);
-        switch (filemime){
+        switch (filemime) {
           default:
-            let data = new Buffer(buff).toString('base64');
+            let data = Buffer.from(buff).toString('base64');
             win.attachHTMLString(`<img style="width:100%" src="data:/${filemime};base64,${data}"/>`);
             break;
         }
         fs.unlink(savepath);
-      }else{
+      } else {
         fs.unlink(savepath);
         throw Error(`Load Error: downsize ${_size} != ${size}`);
       }
@@ -574,13 +578,15 @@ class FileManager {
   // 下载文件
   downloadFile(name, size) {
     const path = this.path + name;
-    const task = this.tasks.new(LANG['download']['task']['name'], path , LANG['download']['task']['wait']);
+    const task = this.tasks.new(LANG['download']['task']['name'], path, LANG['download']['task']['wait']);
     // 获取要保存的路径
     dialog.showSaveDialog({
       title: LANG['download']['title'],
       defaultPath: name
     }, (filePath) => {
-      if (!filePath) { return task.end(LANG['download']['task']['cancel']) };
+      if (!filePath) {
+        return task.end(LANG['download']['task']['cancel'])
+      };
       task.update(LANG['download']['task']['start']);
       let down_size = 0;
       // 删除旧文件（如果存在
@@ -588,11 +594,9 @@ class FileManager {
         fs.unlinkSync(filePath);
       }
       this.core.download(
-        filePath
-        , this.core.filemanager.download_file({
+        filePath, this.core.filemanager.download_file({
           path: path
-        })
-        , (_size) => {
+        }), (_size) => {
           // 计算进度百分比
           down_size += _size;
           let down_progress = parseInt(parseFloat(down_size / size).toFixed(2) * 100);
@@ -605,9 +609,9 @@ class FileManager {
         if (_size === size) {
           task.success(LANG['download']['task']['success']);
           toastr.success(LANG['download']['success'](name), LANG_T['success']);
-        // }else if (_size === 21) {
-        //   task.failed('len=' + _size);
-        }else{
+          // }else if (_size === 21) {
+          //   task.failed('len=' + _size);
+        } else {
           throw Error(`SizeErr: ${_size} != ${size}`);
           // task.failed(LANG['download']['task']['error']())
         }
@@ -618,6 +622,60 @@ class FileManager {
     });
   }
 
+  // 下载多个文件
+  // [{name:"123.txt", size: 1234}]
+  downloadFileMulti(names = []) {
+    let self = this;
+    let selectPaths = dialog.showOpenDialog({
+      title: LANG['download']['title'],
+      properties: ['openDirectory'],
+    });
+    let savePath = null;
+    if (selectPaths && selectPaths.length === 1) {
+      savePath = selectPaths[0];
+    }
+    if (!savePath) {
+      return;
+    }
+    names.forEach((item) => {
+      const path = self.path + item.name;
+      const task = self
+        .tasks
+        .new(LANG['download']['task']['name'], path, LANG['download']['task']['wait']);
+      task.update(LANG['download']['task']['start']);
+      let down_size = 0;
+      let filePath = PATH.join(savePath, item.name);
+      // 删除旧文件（如果存在
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      self.core.download(filePath, self.core.filemanager.download_file({
+          path: path
+        }), (_size) => {
+          // 计算进度百分比
+          down_size += _size;
+          let down_progress = parseInt(parseFloat(down_size / item.size).toFixed(2) * 100);
+          if (!(down_progress % 5)) {
+            task.update(down_progress + '%');
+          };
+        })
+        .then((_size) => {
+          if (_size === item.size) {
+            task.success(LANG['download']['task']['success']);
+            toastr.success(LANG['download']['success'](name), LANG_T['success']);
+            // }else if (_size === 21) {   task.failed('len=' + _size);
+          } else {
+            throw Error(`SizeErr: ${_size} != ${item.size}`);
+            // task.failed(LANG['download']['task']['error']())
+          }
+        })
+        .catch((err) => {
+          task.failed(LANG['download']['task']['error'](err));
+          toastr.error(LANG['download']['error'](name, err), LANG_T['error']);
+        });
+    });
+  }
+
   // wget文件
   wgetFile() {
     let self = this;
@@ -625,7 +683,7 @@ class FileManager {
     // 获取URL
     let _index = layer.prompt({
       title: `<i class="fa fa-cloud-download"></i> ${LANG['wget']['title']}`,
-      content: '<input type="text" style="width:300px;" class="layui-layer-input" id="url_' + hash + '" value="http://" placeholder="target url"><p/><input style="width:300px;" type="text" id="path_' + hash + '" class="layui-layer-input" value="' + self.path + '" placeholder="file name">',
+      content: '<input type="text" style="width:300px;" class="layui-layer-input" id="url_' + hash + '" value="http://" placeholder="target url"><p/><input style="width:300px;" type="text" id="path_' + hash + '" class="layui-layer-input" value="' + antSword.noxss(self.path) + '" placeholder="file name">',
       btn: ['wget'],
       yes: (i) => {
 
@@ -658,7 +716,7 @@ class FileManager {
             task.success(LANG['wget']['task']['success']);
             let _ = path.substr(0, path.lastIndexOf('/') + 1);
             this.files.refreshPath((_ === self.path) ? false : _);
-          }else{
+          } else {
             task.failed(LANG['wget']['task']['failed'](ret));
           }
         }).catch((err) => {
@@ -686,9 +744,11 @@ class FileManager {
         return res(_filePaths);
       }
       dialog.showOpenDialog({
-        properties: [ 'openFile', 'multiSelections' ]
+        properties: ['openFile', 'multiSelections']
       }, (_filePaths) => {
-        if (!_filePaths) { return };
+        if (!_filePaths) {
+          return
+        };
         return res(_filePaths);
       })
     }).then((filePaths) => {
@@ -713,7 +773,7 @@ class FileManager {
           let buff = [];
           // 分段上传大小，默认0.5M(jsp 超过1M响应会出错)
           let dataSplit = 500 * 1024;
-          if ( parseInt((this.opts.otherConf || {})['upload-fragment']) > 0 ) {
+          if (parseInt((this.opts.otherConf || {})['upload-fragment']) > 0) {
             dataSplit = parseInt((this.opts.otherConf || {})['upload-fragment']) * 1024;
           }
           let task = tasks[filePath];
@@ -739,7 +799,7 @@ class FileManager {
               let _b = _buff.shift();
               if (_b) {
                 res(_b);
-              }else{
+              } else {
                 // 上传完毕
                 task.success(LANG['upload']['task']['success']);
                 toastr.success(LANG['upload']['success'](fileName), LANG_T['success']);
@@ -771,15 +831,15 @@ class FileManager {
                 let errmsg = err;
                 if (err.hasOwnProperty('status') && err.hasOwnProperty('response')) {
                   errmsg = `${err.status} ${err.response.res.statusMessage}`;
-                  switch(err.status) {
+                  switch (err.status) {
                     case 413:
                       errmsg += `${LANG['upload']['task']['httperr_413']}`;
                       break;
                     default:
                       break;
                   }
-                }else if(err.hasOwnProperty('errno')) {
-                  switch(err.errno) {
+                } else if (err.hasOwnProperty('errno')) {
+                  switch (err.errno) {
                     case 'ETIME':
                       errmsg = `${LANG['upload']['task']['httperr_etime']}`;
                       break;
@@ -804,28 +864,28 @@ class FileManager {
   }
 
   // 编辑文件
-  editFile(name, openfileintab=false) {
+  editFile(name, openfileintab = false) {
     let self = this;
     let path = this.path + name;
     let editor = null;
     let codes = '';
     let win;
     let hinttext = '';
-    if (openfileintab == false){
+    if (openfileintab == false) {
       win = this.createWin({
-        title: LANG['editor']['title'](path),
+        title: LANG['editor']['title'](antSword.noxss(path)),
         width: 800
       });
-      win.maximize();  
-    }else{
+      win.maximize();
+    } else {
       let _id = String(Math.random()).substr(5, 10);
       antSword['tabbar'].addTab(
         `tab_file_${_id}`,
-        `<i class="fa fa-file-o"></i> ${name}`,
+        `<i class="fa fa-file-o"></i> ${antSword.noxss(name)}`,
         null, null, true, true
       );
       win = antSword['tabbar'].cells(`tab_file_${_id}`);
-      hinttext = `IP:${this.opts['ip']} File:${path}`;
+      hinttext = `IP:${this.opts['ip']} File:${antSword.noxss(path)}`;
     }
 
     win.progressOn();
@@ -833,15 +893,37 @@ class FileManager {
     // 检测文件后缀
     let ext = name.substr(name.lastIndexOf('.') + 1);
     let ext_dict = {
-      'php': 'php', 'c': 'c_cpp', 'cpp': 'c_cpp', 'h': 'c_cpp',
-      'coffee': 'coffee', 'cfm': 'coldfusion', 'css': 'css',
-      'go': 'golang', 'html': 'html', 'ini': 'ini', 'conf': 'ini',
-      'jade': 'jade', 'java': 'java', 'js': 'javascript', 'json': 'json',
-      'jsp': 'jsp', 'jsx': 'jsx', 'less': 'less', 'lua': 'lua', 'md': 'markdown',
-      'sql': 'sql', 'pl': 'perl', 'py': 'python', 'rb': 'ruby',
-      'sh': 'sh', 'txt': 'text', 'xml': 'xml'
+      'php': 'php',
+      'c': 'c_cpp',
+      'cpp': 'c_cpp',
+      'h': 'c_cpp',
+      'coffee': 'coffee',
+      'cfm': 'coldfusion',
+      'css': 'css',
+      'go': 'golang',
+      'html': 'html',
+      'ini': 'ini',
+      'conf': 'ini',
+      'jade': 'jade',
+      'java': 'java',
+      'js': 'javascript',
+      'json': 'json',
+      'jsp': 'jsp',
+      'jsx': 'jsx',
+      'less': 'less',
+      'lua': 'lua',
+      'md': 'markdown',
+      'sql': 'sql',
+      'pl': 'perl',
+      'py': 'python',
+      'rb': 'ruby',
+      'sh': 'sh',
+      'txt': 'text',
+      'xml': 'xml'
     }
-    if (!(ext in ext_dict)) { ext = 'txt' };
+    if (!(ext in ext_dict)) {
+      ext = 'txt'
+    };
     // 创建窗口工具栏
     let toolbar = win.attachToolbar();
     let _options = [];
@@ -853,17 +935,34 @@ class FileManager {
         icon: 'code',
         type: 'button'
       };
-      (_ === ext) ? _opt['selected'] = true : 0;
+      (_ === ext) ? _opt['selected'] = true: 0;
       _options.push(_opt);
     }
-    toolbar.loadStruct([
-      { id: 'hinttext', type: 'text', text: hinttext},
-      { type: 'separator' },
-      { type: 'spacer' },
-      { id: 'save', type: 'button', icon: 'save', text: LANG['editor']['toolbar']['save'] },
-      { type: 'separator' },
+    toolbar.loadStruct([{
+        id: 'hinttext',
+        type: 'text',
+        text: hinttext
+      },
       {
-        id: 'encode', type: 'buttonSelect', icon: 'language', openAll: true,
+        type: 'separator'
+      },
+      {
+        type: 'spacer'
+      },
+      {
+        id: 'save',
+        type: 'button',
+        icon: 'save',
+        text: LANG['editor']['toolbar']['save']
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'encode',
+        type: 'buttonSelect',
+        icon: 'language',
+        openAll: true,
         text: LANG['editor']['toolbar']['encode'],
         options: (() => {
           let ret = [];
@@ -880,7 +979,10 @@ class FileManager {
           return ret;
         })()
       }, {
-        id: 'mode', type: 'buttonSelect', icon: 'th-list', openAll: true,
+        id: 'mode',
+        type: 'buttonSelect',
+        icon: 'th-list',
+        openAll: true,
         text: LANG['editor']['toolbar']['mode'],
         options: _options
       },
@@ -901,19 +1003,19 @@ class FileManager {
             toastr.success(LANG['editor']['success'](path), LANG_T['success']);
             // 刷新目录（显示更改时间、大小等）
             self.files.refreshPath();
-          }else{
+          } else {
             toastr.error(LANG['editor']['error'](path, ret === '0' ? '' : '<br/>' + ret), LANG_T['error']);
           }
         }).catch((err) => {
 
         });
-      }else if (id.startsWith('mode_')) {
+      } else if (id.startsWith('mode_')) {
         let mode = id.split('_')[1];
         editor.session.setMode(`ace/mode/${mode}`);
-      }else if (id.startsWith('encode_')) {
+      } else if (id.startsWith('encode_')) {
         let encode = id.split('_')[1];
-        editor.session.setValue(iconv.decode(new Buffer(codes), encode).toString());
-      }else{
+        editor.session.setValue(iconv.decode(Buffer.from(codes), encode).toString());
+      } else {
         console.info('toolbar.onClick', id);
       }
     });
@@ -927,7 +1029,7 @@ class FileManager {
       let ret = res['text'];
       codes = res['buff'];
       let encoding = res['encoding'] || this.opts['encode'];
-      if(encoding.toUpperCase() == "UTF-8") {
+      if (encoding.toUpperCase() == "UTF-8") {
         encoding = "UTF8";
       }
       toolbar.setListOptionSelected('encode', `encode_${encoding}`);
@@ -979,9 +1081,9 @@ class FileManager {
     let _id = String(Math.random()).substr(5, 10);
     // 默认配置
     let opt = $.extend({
-        title: 'Window:' + _id,
-        width: 660,
-        height: 550
+      title: 'Window:' + _id,
+      width: 660,
+      height: 550
     }, opts);
 
     // 创建窗口

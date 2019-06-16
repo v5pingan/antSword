@@ -28,7 +28,8 @@ class Database {
       autoload: true
     });
     // 监听事件
-    electron.ipcMain
+    electron
+      .ipcMain
       .on('shell-add', this.addShell.bind(this))
       .on('shell-del', this.delShell.bind(this))
       .on('shell-edit', this.editShell.bind(this))
@@ -48,24 +49,26 @@ class Database {
       .on('shell-getPluginDataConf', this.getPluginDataConf.bind(this));
   }
 
-  convertOptstoNedbQuery(opts={}) {
+  convertOptstoNedbQuery(opts = {}) {
     var self = this;
-    if(opts instanceof Array) {
+    if (opts instanceof Array) {
       for (let i = 0; i < opts.length; i++) {
         opts[i] = self.convertOptstoNedbQuery(opts[i]);
       }
-    }else if(opts instanceof Object) {
-      Object.keys(opts).map((f) => {
-        if(opts[f] instanceof Object) {
-          opts[f] = self.convertOptstoNedbQuery(opts[f]);
-        }
-        if(f == "$regex") {
-          if(opts[f].charAt(0) == '*') {
-            opts[f] = opts[f].substring(1);
+    } else if (opts instanceof Object) {
+      Object
+        .keys(opts)
+        .map((f) => {
+          if (opts[f] instanceof Object) {
+            opts[f] = self.convertOptstoNedbQuery(opts[f]);
           }
-          opts[f] = new RegExp(opts[f], 'i');
-        }
-      });
+          if (f == "$regex") {
+            if (opts[f].charAt(0) == '*') {
+              opts[f] = opts[f].substring(1);
+            }
+            opts[f] = new RegExp(opts[f], 'i');
+          }
+        });
     }
     return opts;
   }
@@ -78,7 +81,8 @@ class Database {
   findShell(event, opts = {}) {
     opts = this.convertOptstoNedbQuery(opts);
     logger.debug('findShell', opts);
-    this.cursor
+    this
+      .cursor
       .find(opts)
       .sort({
         utime: -1
@@ -96,13 +100,14 @@ class Database {
    */
   findOneShell(event, opts) {
     logger.debug('findOneShell', opts);
-    this.cursor.findOne({
-      _id: opts
-    }, (err, ret) => {
-      event.returnValue = err || ret;
-    });
+    this
+      .cursor
+      .findOne({
+        _id: opts
+      }, (err, ret) => {
+        event.returnValue = err || ret;
+      });
   }
-
 
   /**
    * 根据URL解析出IP&&地理位置
@@ -140,29 +145,33 @@ class Database {
    */
   addShell(event, opts) {
     logger.info('addShell', opts);
-    if(opts.base['url'].match(CONF.urlblacklist)){
+    if (opts.base['url'].match(CONF.urlblacklist)) {
       event.returnValue = "Blacklist URL"
       return
     }
-    this._url2ip(opts.base['url'])
+    this
+      ._url2ip(opts.base['url'])
       .then((ret) => {
-        this.cursor.insert({
-          category: opts.base['category'] || 'default',
-          url: opts.base['url'],
-          pwd: opts.base['pwd'],
-          note: opts.base['note'],
-          type: opts.base['type'],
-          ip: ret['ip'],
-          addr: ret['addr'],
-          encode: opts.base['encode'],
-          encoder: opts.base['encoder'],
-          httpConf: opts.http,
-          otherConf: opts.other,
-          ctime: +new Date,
-          utime: +new Date
-        }, (_err, _ret) => {
-          event.returnValue = _err || _ret;
-        });
+        this
+          .cursor
+          .insert({
+            category: opts.base['category'] || 'default',
+            url: opts.base['url'],
+            pwd: opts.base['pwd'],
+            note: opts.base['note'],
+            type: opts.base['type'],
+            ip: ret['ip'],
+            addr: ret['addr'],
+            encode: opts.base['encode'],
+            encoder: opts.base['encoder'],
+            decoder: opts.base['decoder'],
+            httpConf: opts.http,
+            otherConf: opts.other,
+            ctime: +new Date,
+            utime: +new Date
+          }, (_err, _ret) => {
+            event.returnValue = _err || _ret;
+          });
       })
       .catch((_err) => {
         event.returnValue = _err;
@@ -180,31 +189,35 @@ class Database {
 
     const _new = opts.new;
     const _old = opts.old;
-    if(_new.base['url'].match(CONF.urlblacklist)){
+    if (_new.base['url'].match(CONF.urlblacklist)) {
       event.returnValue = "Blacklist URL"
       return
     }
-    this._url2ip(_new.base['url'])
+    this
+      ._url2ip(_new.base['url'])
       .then((ret) => {
-        this.cursor.update({
-          _id: _old['_id']
-        }, {
-          $set: {
-            ip: ret['ip'],
-            addr: ret['addr'],
-            url: _new.base['url'],
-            pwd: _new.base['pwd'],
-            note: _new.base['note'],
-            type: _new.base['type'],
-            encode: _new.base['encode'],
-            encoder: _new.base['encoder'],
-            httpConf: _new.http,
-            otherConf: _new.other,
-            utime: +new Date
-          }
-        }, (_err, _ret) => {
-          event.returnValue = _err || _ret;
-        })
+        this
+          .cursor
+          .update({
+            _id: _old['_id']
+          }, {
+            $set: {
+              ip: ret['ip'],
+              addr: ret['addr'],
+              url: _new.base['url'],
+              pwd: _new.base['pwd'],
+              note: _new.base['note'],
+              type: _new.base['type'],
+              encode: _new.base['encode'],
+              encoder: _new.base['encoder'],
+              decoder: _new.base['decoder'],
+              httpConf: _new.http,
+              otherConf: _new.other,
+              utime: +new Date
+            }
+          }, (_err, _ret) => {
+            event.returnValue = _err || _ret;
+          })
       })
       .catch((_err) => {
         event.returnValue = _err;
@@ -220,16 +233,18 @@ class Database {
   updateHttpConf(event, opt = {}) {
     logger.warn('updateHttpConf', opt);
 
-    this.cursor.update({
-      _id: opt._id
-    }, {
-      $set: {
-        httpConf: opt.conf,
-        utime: +new Date
-      }
-    }, (_err, _ret) => {
-      event.returnValue = _err || _ret;
-    });
+    this
+      .cursor
+      .update({
+        _id: opt._id
+      }, {
+        $set: {
+          httpConf: opt.conf,
+          utime: +new Date
+        }
+      }, (_err, _ret) => {
+        event.returnValue = _err || _ret;
+      });
   }
 
   /**
@@ -240,15 +255,17 @@ class Database {
    */
   delShell(event, opts) {
     logger.warn('delShell', opts);
-    this.cursor.remove({
-      _id: {
-        $in: opts
-      }
-    }, {
-      multi: true
-    }, (err, num) => {
-      event.returnValue = err || num;
-    })
+    this
+      .cursor
+      .remove({
+        _id: {
+          $in: opts
+        }
+      }, {
+        multi: true
+      }, (err, num) => {
+        event.returnValue = err || num;
+      })
   }
 
   /**
@@ -259,13 +276,15 @@ class Database {
    */
   clearShell(event, opts) {
     logger.fatal('clearShell', opts);
-    this.cursor.remove({
-      category: opts
-    }, {
-      multi: true
-    }, (err, num) => {
-      event.returnValue = err || num;
-    })
+    this
+      .cursor
+      .remove({
+        category: opts
+      }, {
+        multi: true
+      }, (err, num) => {
+        event.returnValue = err || num;
+      })
   }
 
   /**
@@ -276,17 +295,19 @@ class Database {
    */
   renameShellCategory(event, opts) {
     logger.warn('renameShellCategory', opts);
-    this.cursor.update({
-      category: opts['oldName']
-    }, {
-      $set: {
-        category: opts['newName']
-      }
-    }, {
-      multi: true
-    }, (err, num) => {
-      event.returnValue = err || num;
-    })
+    this
+      .cursor
+      .update({
+        category: opts['oldName']
+      }, {
+        $set: {
+          category: opts['newName']
+        }
+      }, {
+        multi: true
+      }, (err, num) => {
+        event.returnValue = err || num;
+      })
   }
 
   /**
@@ -297,20 +318,22 @@ class Database {
    */
   moveShell(event, opts) {
     logger.info('moveShell', opts);
-    this.cursor.update({
-      _id: {
-        $in: opts['ids'] || []
-      }
-    }, {
-      $set: {
-        category: opts['category'] || 'default',
-        utime: +new Date
-      }
-    }, {
-      multi: true
-    }, (err, num) => {
-      event.returnValue = err || num;
-    })
+    this
+      .cursor
+      .update({
+        _id: {
+          $in: opts['ids'] || []
+        }
+      }, {
+        $set: {
+          category: opts['category'] || 'default',
+          utime: +new Date
+        }
+      }, {
+        multi: true
+      }, (err, num) => {
+        event.returnValue = err || num;
+      })
   }
 
   /**
@@ -321,26 +344,30 @@ class Database {
   addDataConf(event, opts) {
     logger.info('addDataConf', opts);
     // 1. 获取原配置列表
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      let confs = ret['database'] || {};
-      // 随机Id（顺序增长
-      const random_id = parseInt(+new Date + Math.random() * 1000).toString(16);
-      // 添加到配置
-      confs[random_id] = opts['data'];
-      // 更新数据库
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: {
-          database: confs,
-          utime: +new Date
-        }
-      }, (_err, _ret) => {
-        event.returnValue = random_id;
+      }, (err, ret) => {
+        let confs = ret['database'] || {};
+        // 随机Id（顺序增长
+        const random_id = parseInt(+new Date + Math.random() * 1000).toString(16);
+        // 添加到配置
+        confs[random_id] = opts['data'];
+        // 更新数据库
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: {
+              database: confs,
+              utime: +new Date
+            }
+          }, (_err, _ret) => {
+            event.returnValue = random_id;
+          });
       });
-    });
   }
 
   /**
@@ -351,24 +378,28 @@ class Database {
   editDataConf(event, opts) {
     logger.info('editDataConf', opts);
     // 1. 获取原配置列表
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      let confs = ret['database'] || {};
-      // 添加到配置
-      confs[opts['id']] = opts['data'];
-      // 更新数据库
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: {
-          database: confs,
-          utime: +new Date
-        }
-      }, (_err, _ret) => {
-        event.returnValue = opts['id'];
+      }, (err, ret) => {
+        let confs = ret['database'] || {};
+        // 添加到配置
+        confs[opts['id']] = opts['data'];
+        // 更新数据库
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: {
+              database: confs,
+              utime: +new Date
+            }
+          }, (_err, _ret) => {
+            event.returnValue = opts['id'];
+          });
       });
-    });
   }
 
   /**
@@ -380,24 +411,28 @@ class Database {
   delDataConf(event, opts) {
     logger.info('delDataConf', opts);
     // 1. 获取原配置
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      let confs = ret['database'] || {};
-      // 2. 删除配置
-      delete confs[opts['id']];
-      // 3. 更新数据库
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: {
-          database: confs,
-          utime: +new Date
-        }
-      }, (_err, _ret) => {
-        event.returnValue = _err || _ret;
-      });
-    })
+      }, (err, ret) => {
+        let confs = ret['database'] || {};
+        // 2. 删除配置
+        delete confs[opts['id']];
+        // 3. 更新数据库
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: {
+              database: confs,
+              utime: +new Date
+            }
+          }, (_err, _ret) => {
+            event.returnValue = _err || _ret;
+          });
+      })
   }
 
   /**
@@ -408,12 +443,14 @@ class Database {
    */
   getDataConf(event, opts) {
     logger.info('getDatConf', opts);
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      const confs = ret['database'] || {};
-      event.returnValue = err || confs[opts['id']];
-    });
+    this
+      .cursor
+      .findOne({
+        _id: opts['_id']
+      }, (err, ret) => {
+        const confs = ret['database'] || {};
+        event.returnValue = err || confs[opts['id']];
+      });
   }
 
   /**
@@ -425,29 +462,33 @@ class Database {
   addPluginDataConf(event, plugin, opts) {
     logger.info('addPluginDataConf', plugin, opts);
     // 1. 获取原配置列表
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      ret['plugins'] = ret['plugins'] || {};
-      let confs = ret['plugins'][plugin] || {};
-      // 随机Id（顺序增长
-      const random_id = parseInt(+new Date + Math.random() * 1000).toString(16);
-      // 添加到配置
-      confs[random_id] = opts['data'];
-      let setdata = {
-        utime: +new Date,
-      }
-      setdata[`plugins.${plugin}`] = confs;
-
-      // 更新
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: setdata
-      }, (_err, _ret) => {
-        event.returnValue = random_id;
+      }, (err, ret) => {
+        ret['plugins'] = ret['plugins'] || {};
+        let confs = ret['plugins'][plugin] || {};
+        // 随机Id（顺序增长
+        const random_id = parseInt(+new Date + Math.random() * 1000).toString(16);
+        // 添加到配置
+        confs[random_id] = opts['data'];
+        let setdata = {
+          utime: +new Date
+        }
+        setdata[`plugins.${plugin}`] = confs;
+
+        // 更新
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: setdata
+          }, (_err, _ret) => {
+            event.returnValue = random_id;
+          });
       });
-    });
   }
   /**
    * 修改插件数据配置
@@ -458,26 +499,30 @@ class Database {
   editPluginDataConf(event, plugin, opts) {
     logger.info('editPluginDataConf', plugin, opts);
     // 1. 获取原配置列表
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      ret['plugins'] = ret['plugins'] || {};
-      let confs = ret['plugins'][plugin] || {};
-      // 添加到配置
-      confs[opts['id']] = opts['data'];
-      let setdata = {
-        utime: +new Date,
-      }
-      setdata[`plugins.${plugin}`] = confs;
-      // 更新数据库
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: setdata
-      }, (_err, _ret) => {
-        event.returnValue = opts['id'];
+      }, (err, ret) => {
+        ret['plugins'] = ret['plugins'] || {};
+        let confs = ret['plugins'][plugin] || {};
+        // 添加到配置
+        confs[opts['id']] = opts['data'];
+        let setdata = {
+          utime: +new Date
+        }
+        setdata[`plugins.${plugin}`] = confs;
+        // 更新数据库
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: setdata
+          }, (_err, _ret) => {
+            event.returnValue = opts['id'];
+          });
       });
-    });
   }
 
   /**
@@ -490,26 +535,30 @@ class Database {
   delPluginDataConf(event, plugin, opts) {
     logger.info('delPluginDataConf', plugin, opts);
     // 1. 获取原配置
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      ret['plugins'] = ret['plugins'] || {};
-      let confs = ret['plugins'][plugin] || {};
-      // 2. 删除配置
-      delete confs[opts['id']];
-      let setdata = {
-        utime: +new Date,
-      }
-      setdata[`plugins.${plugin}`] = confs;
-      // 3. 更新数据库
-      this.cursor.update({
+    this
+      .cursor
+      .findOne({
         _id: opts['_id']
-      }, {
-        $set: setdata
-      }, (_err, _ret) => {
-        event.returnValue = _err || _ret;
-      });
-    })
+      }, (err, ret) => {
+        ret['plugins'] = ret['plugins'] || {};
+        let confs = ret['plugins'][plugin] || {};
+        // 2. 删除配置
+        delete confs[opts['id']];
+        let setdata = {
+          utime: +new Date
+        }
+        setdata[`plugins.${plugin}`] = confs;
+        // 3. 更新数据库
+        this
+          .cursor
+          .update({
+            _id: opts['_id']
+          }, {
+            $set: setdata
+          }, (_err, _ret) => {
+            event.returnValue = _err || _ret;
+          });
+      })
   }
 
   /**
@@ -521,13 +570,15 @@ class Database {
    */
   getPluginDataConf(event, plugin, opts) {
     logger.info('getPluginDatConf', plugin, opts);
-    this.cursor.findOne({
-      _id: opts['_id']
-    }, (err, ret) => {
-      ret['plugins'] = ret['plugins'] || {};
-      const confs = ret['plugins'][plugin] || {};
-      event.returnValue = err || confs[opts['id']];
-    });
+    this
+      .cursor
+      .findOne({
+        _id: opts['_id']
+      }, (err, ret) => {
+        ret['plugins'] = ret['plugins'] || {};
+        const confs = ret['plugins'][plugin] || {};
+        event.returnValue = err || confs[opts['id']];
+      });
   }
 }
 

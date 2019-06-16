@@ -10,6 +10,6 @@ module.exports = () => ({
   },
   listcmd: {
     _: 'Y',
-    'z1': '#{binarr}',
+    'z1': '#{binarr}'
   }
 })

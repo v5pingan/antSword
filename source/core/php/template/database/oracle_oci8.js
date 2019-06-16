@@ -1,16 +1,15 @@
 /**
  * 数据库管理模板::oracle oci8 驱动
  * i 数据分隔符号 => \t|\t
- * 
+ *
  * session_mode: OCI_DEFAULT 0 OCI_SYSOPER 4 OCI_SYSDBA 2
- * 
+ *
  */
 
 module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   // 显示所有数据库
   show_databases: {
-    _:
-      `$m=get_magic_quotes_gpc();
+    _: `$m=get_magic_quotes_gpc();
       $sid=$m?stripslashes($_POST["${arg1}"]):$_POST["${arg1}"];
       $usr=$m?stripslashes($_POST["${arg2}"]):$_POST["${arg2}"];
       $pwd=$m?stripslashes($_POST["${arg3}"]):$_POST["${arg3}"];
@@ -42,8 +41,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示数据库所有表
   show_tables: {
-    _:
-      `$m=get_magic_quotes_gpc();
+    _: `$m=get_magic_quotes_gpc();
       $sid=$m?stripslashes($_POST["${arg1}"]):$_POST["${arg1}"];
       $usr=$m?stripslashes($_POST["${arg2}"]):$_POST["${arg2}"];
       $pwd=$m?stripslashes($_POST["${arg3}"]):$_POST["${arg3}"];
@@ -84,8 +82,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示表字段
   show_columns: {
-    _:
-      `$m=get_magic_quotes_gpc();
+    _: `$m=get_magic_quotes_gpc();
       $sid=$m?stripslashes($_POST["${arg1}"]):$_POST["${arg1}"];
       $usr=$m?stripslashes($_POST["${arg2}"]):$_POST["${arg2}"];
       $pwd=$m?stripslashes($_POST["${arg3}"]):$_POST["${arg3}"];
@@ -128,8 +125,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 执行SQL语句
   query: {
-    _:
-      `$m=get_magic_quotes_gpc();
+    _: `$m=get_magic_quotes_gpc();
       $sid=$m?stripslashes($_POST["${arg1}"]):$_POST["${arg1}"];
       $usr=$m?stripslashes($_POST["${arg2}"]):$_POST["${arg2}"];
       $pwd=$m?stripslashes($_POST["${arg3}"]):$_POST["${arg3}"];
@@ -176,6 +172,6 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
     [arg3]: '#{passwd}',
     [arg4]: '#{db}',
     [arg5]: '#{base64::sql}',
-    [arg6]: '#{encode}',
+    [arg6]: '#{encode}'
   }
 })

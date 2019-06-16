@@ -5,14 +5,14 @@
 
 'use strict'
 
-module.exports = (pwd, data) => {
+module.exports = (pwd, data, ext = null) => {
   // 编码函数
   const encode = (php) => {
     let ret = [];
     let i = 0;
-    while(i < php.length) {
+    while (i < php.length) {
       ret.push(php[i].charCodeAt().toString(16));
-      i ++;
+      i++;
     }
     return `@eVAl(cHr(0x${ret.join(').ChR(0x')}));`;
   }

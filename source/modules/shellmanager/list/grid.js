@@ -2,7 +2,6 @@
  * 数据表格模块
  */
 
-
 const FileManager = require('../../filemanager/');
 const LANG = antSword['language']['shellmanager']['list']['grid'];
 const ContextMenu = require('./contextmenu');
@@ -32,8 +31,12 @@ class Grid {
     grid.setColAlign("left,left,left,left,center,center");
     grid.enableMultiselect(true);
     // 根据设置隐藏相应的列
-    const dis_smhc = localStorage.hasOwnProperty('display_shellmanager_hiddencolumns') ? JSON.parse(localStorage.display_shellmanager_hiddencolumns):[];
-    dis_smhc.map((_)=>{grid.setColumnHidden(_,true)});
+    const dis_smhc = localStorage.hasOwnProperty('display_shellmanager_hiddencolumns') ?
+      JSON.parse(localStorage.display_shellmanager_hiddencolumns) :
+      [];
+    dis_smhc.map((_) => {
+      grid.setColumnHidden(_, true)
+    });
 
     // 隐藏右键菜单
     grid.attachEvent('onRowSelect', bmenu.hide);
@@ -41,7 +44,11 @@ class Grid {
       .on('click', bmenu.hide)
       .on('contextmenu', (e) => {
         if (e.target.nodeName === 'DIV' && grid.callEvent instanceof Function) {
-          grid.callEvent('onRightClick', [grid.getSelectedRowId(), '', e]);
+          grid.callEvent('onRightClick', [
+            grid.getSelectedRowId(),
+            '',
+            e
+          ]);
         }
       });
 
@@ -71,18 +78,16 @@ class Grid {
     // 获取选择数据信息
     let infos = [];
     if (ids.length >= 1) {
-      infos = antSword['ipcRenderer'].sendSync(
-        'shell-find',
-        { _id: { $in: ids } }
-      )
+      infos = antSword['ipcRenderer'].sendSync('shell-find', {
+        _id: {
+          $in: ids
+        }
+      })
     }
     // 获取选中的单条数据
     let info = infos[0];
     // 弹出右键菜单
-    new ContextMenu(
-      infos, event,
-      id, ids
-    );
+    new ContextMenu(infos, event, id, ids);
     return true;
   }
 

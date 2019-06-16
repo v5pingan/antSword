@@ -12,10 +12,7 @@ const path = global.require('path');
 class Plugin {
   constructor() {
     // 注册菜单事件
-    antSword['menubar'].reg(
-      'plugin-store',
-      this.initWin.bind(this, 'ant-views://plugin.html')
-    );
+    antSword['menubar'].reg('plugin-store', this.initWin.bind(this, 'ant-views://front/plugin.html'));
     this.win = null;
   }
 
@@ -26,7 +23,9 @@ class Plugin {
    */
   initWin(url) {
     if (this.win) {
-      return this.win.focus();
+      return this
+        .win
+        .focus();
     }
     let win = new antSword['remote'].BrowserWindow({
       width: 950,
@@ -41,17 +40,18 @@ class Plugin {
     });
     let ses = win.webContents.session;
     let proxyuri = "";
-    if(antSword.aproxymode != "noproxy") {
+    if (antSword.aproxymode != "noproxy") {
       proxyuri = antSword.aproxyuri;
     }
-    ses.setProxy({proxyRules: proxyuri}, ()=>{
+    ses.setProxy({
+      proxyRules: proxyuri
+    }, () => {
       win.loadURL(url);
       win.show();
       // win.openDevTools();
       this.win = win;
     });
   }
-
 
 }
 

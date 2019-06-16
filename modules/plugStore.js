@@ -16,26 +16,33 @@ class PlugStore {
     logger = new electron.Logger('PlugStore');
     this.listenDownload(mainWindow);
 
-    electron.ipcMain
+    electron
+      .ipcMain
       .on('store-uninstall', (event, plugName) => {
         logger.warn('UnInstall', plugName);
         // 删除目录
-        this.rmdir(
-          path.join(CONF.plugPath, `${plugName}-master`)
-        ).then((ret) => {
-          event.returnValue = ret;
-          // 重新加载插件列表
-          mainWindow.webContents.send('reloadPlug', true);
-        });
+        this
+          .rmdir(path.join(CONF.plugPath, `${plugName}-master`))
+          .then((ret) => {
+            event.returnValue = ret;
+            // 重新加载插件列表
+            mainWindow
+              .webContents
+              .send('reloadPlug', true);
+          });
       })
       .on('store-uninstall-dev', (event, plugPath) => {
         logger.warn('UnInstall.DEV', plugPath);
         // 删除目录
-        this.rmdir(plugPath).then((ret) => {
-          event.returnValue = ret;
-          // 重新加载插件列表
-          mainWindow.webContents.send('reloadPlug', true);
-        });
+        this
+          .rmdir(plugPath)
+          .then((ret) => {
+            event.returnValue = ret;
+            // 重新加载插件列表
+            mainWindow
+              .webContents
+              .send('reloadPlug', true);
+          });
       })
       // 获取插件路径
       .on('store-config-plugPath', (event) => {
@@ -49,52 +56,61 @@ class PlugStore {
    * @return {[type]}            [description]
    */
   listenDownload(mainWindow) {
-    mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
-      let fileName = item.getFilename().replace(/\-master\.zip$/,'');
-      let downLink = item.getURL();
-      logger.info('down-store-plug', downLink);
-      // 判断是否下载为插件
-      if (downLink.indexOf('github.com/AntSword-Store') > 0) {
-        // 1. 设置插件存储目录
-        let savePath = path.join(CONF.tmpPath, `${fileName}.zip`);
-        item.setSavePath(savePath);
-        webContents.send('store-download-progress', {
-          file: fileName,
-          type: 'init',
-          total: item.getTotalBytes()
-        });
-        // 2. 插件下载进度更新
-        item.on('updated', () => {
+    mainWindow
+      .webContents
+      .session
+      .on('will-download', (event, item, webContents) => {
+        let fileName = item
+          .getFilename()
+          .replace(/\-master\.zip$/, '');
+        let downLink = item.getURL();
+        logger.info('down-store-plug', downLink);
+        // 判断是否下载为插件
+        if (downLink.indexOf('github.com/AntSword-Store') > 0) {
+          // 1. 设置插件存储目录
+          let savePath = path.join(CONF.tmpPath, `${fileName}.zip`);
+          item.setSavePath(savePath);
           webContents.send('store-download-progress', {
             file: fileName,
-            type: 'downloading',
-            size: item.getReceivedBytes()
+            type: 'init',
+            total: item.getTotalBytes()
           });
-        });
-        // 3. 插件下载完毕
-        item.on('done', (e, state) => {
-          webContents.send('store-download-progress', {
-            file: fileName,
-            path: savePath,
-            type: 'downloaded',
-            state: state
-          });
-          if (state !== 'completed') { return };
-          // 解压安装插件
-          UNZIP(savePath, {
-            dir: CONF.plugPath
-          }, (err) => {
+          // 2. 插件下载进度更新
+          item.on('updated', () => {
             webContents.send('store-download-progress', {
-              type: 'installed',
-              file: fileName
+              file: fileName,
+              type: 'downloading',
+              size: item.getReceivedBytes()
             });
-            logger.info('Installed', fileName);
-            // 重新加载插件列表
-            mainWindow.webContents.send('reloadPlug', true);
           });
-        });
-      }
-    });
+          // 3. 插件下载完毕
+          item.on('done', (e, state) => {
+            webContents.send('store-download-progress', {
+              file: fileName,
+              path: savePath,
+              type: 'downloaded',
+              state: state
+            });
+            if (state !== 'completed') {
+              return
+            };
+            // 解压安装插件
+            UNZIP(savePath, {
+              dir: CONF.plugPath
+            }, (err) => {
+              webContents.send('store-download-progress', {
+                type: 'installed',
+                file: fileName
+              });
+              logger.info('Installed', fileName);
+              // 重新加载插件列表
+              mainWindow
+                .webContents
+                .send('reloadPlug', true);
+            });
+          });
+        }
+      });
   }
 
   /**
@@ -107,19 +123,23 @@ class PlugStore {
       let ret = true;
       // 循环删除目录
       const _rmdir = (_dir) => {
-        if (!fs.existsSync(_dir)) { return }
-        fs.readdirSync(_dir).map((_) => {
-          // 生成完整路径
-          let _path = path.join(dir, _);
-          // 如果是目录，则继续循环，否则删除
-          if (fs.lstatSync(_path).isDirectory()) {
-            return this.rmdir(_path);
-          }
-          fs.unlinkSync(_path);
-        });
+        if (!fs.existsSync(_dir)) {
+          return
+        }
+        fs
+          .readdirSync(_dir)
+          .map((_) => {
+            // 生成完整路径
+            let _path = path.join(dir, _);
+            // 如果是目录，则继续循环，否则删除
+            if (fs.lstatSync(_path).isDirectory()) {
+              return this.rmdir(_path);
+            }
+            fs.unlinkSync(_path);
+          });
         fs.rmdirSync(_dir);
       }
-      try{
+      try {
         _rmdir(dir);
       } catch (e) {
         ret = e;

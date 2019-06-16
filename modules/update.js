@@ -15,9 +15,51 @@ const tar = require('tar');
 class Update {
   constructor(electron) {
     this.logger = new electron.Logger('Update');
-    electron.ipcMain
-    .on('check-update', this.checkUpdate.bind(this))
-    .on('update-download', this.onDownlaod.bind(this));
+    electron
+      .ipcMain
+      .on('check-update', this.checkUpdate.bind(this))
+      .on('check-loader-update', this.checkLoaderUpdate.bind(this))
+      .on('update-download', this.onDownlaod.bind(this));
+  }
+
+  /**
+   * 检查 loader 是否需要更新
+   * @param {[type]} event
+   */
+  checkLoaderUpdate(event) {
+    this
+      .logger
+      .debug('checkLoaderUpdate..')
+    superagent
+      .get('https://api.github.com/repos/antswordproject/antSword-Loader/releases/latest')
+      .end((err, ret) => {
+        try {
+          let lastInfo = JSON.parse(ret.text);
+          let newVersion = lastInfo['tag_name'];
+          let curVersion = process.env.AS_LOADER_VER || '2.0.1';
+          // 比对版本
+          if (this.CompVersion(curVersion, newVersion)) {
+            this
+              .logger
+              .info('Found a new loader version', newVersion);
+            event
+              .sender
+              .send('notification-loader-update', {
+                ver: newVersion,
+                url: lastInfo['html_url'],
+                body: lastInfo['body']
+              });
+          } else {
+            this
+              .logger
+              .warn('No new loader version.', newVersion, curVersion);
+          }
+        } catch (e) {
+          this
+            .logger
+            .fatal('ERR', e);
+        }
+      });
   }
 
   /**
@@ -26,7 +68,9 @@ class Update {
    * @return {[type]} [description]
    */
   checkUpdate(event) {
-    this.logger.debug('checkUpdate..');
+    this
+      .logger
+      .debug('checkUpdate..');
     superagent
       .get('https://api.github.com/repos/antoor/antSword/releases/latest')
       .end((err, ret) => {
@@ -36,16 +80,25 @@ class Update {
           let curVersion = config['package'].version;
           // 比对版本
           if (this.CompVersion(curVersion, newVersion)) {
-            this.logger.info('Found a new version', newVersion);
-            event.sender.send('notification-update', {
-              ver: newVersion,
-              url: lastInfo['html_url']
-            });
+            this
+              .logger
+              .info('Found a new version', newVersion);
+            event
+              .sender
+              .send('notification-update', {
+                ver: newVersion,
+                url: lastInfo['html_url'],
+                body: lastInfo['body']
+              });
           } else {
-            this.logger.warn('No new version.', newVersion, curVersion);
+            this
+              .logger
+              .warn('No new version.', newVersion, curVersion);
           }
-        } catch(e) {
-          this.logger.fatal('ERR', e);
+        } catch (e) {
+          this
+            .logger
+            .fatal('ERR', e);
         }
       });
   }
@@ -58,18 +111,20 @@ class Update {
    */
   CompVersion(curVer, newVer) {
     // 如果版本相同
-    if (curVer === newVer) { return false }
+    if (curVer === newVer) {
+      return false
+    }
     let currVerArr = curVer.split(".");
     let promoteVerArr = newVer.split(".");
     let len = Math.max(currVerArr.length, promoteVerArr.length);
     for (let i = 0; i < len; i++) {
-        let proVal = ~~promoteVerArr[i],
-            curVal = ~~currVerArr[i];
-        if (proVal < curVal) {
-            return false;
-        } else if (proVal > curVal) {
-            return true;
-        }
+      let proVal = ~~promoteVerArr[i],
+        curVal = ~~currVerArr[i];
+      if (proVal < curVal) {
+        return false;
+      } else if (proVal > curVal) {
+        return true;
+      }
     }
     return false;
   }
@@ -92,67 +147,82 @@ class Update {
     let tempData = [];
     let totalsize = 0;
     let downsize = 0;
-    let url="https://github.com/AntSwordProject/AntSword/archive/master.tar.gz";
-    superagent.head(url)
-    .set('User-Agent', "antSword/v2.0")
-    .redirects(5)
-    .timeout(30000)
-    .end((err, res)=>{
-      if(err){
-        event.sender.send(`update-error-${hash}`, err);
-      }else{
-        totalsize = parseInt(res.header['content-length']);
-        superagent
-        .get(url)
-        .set('User-Agent', "antSword/v2.0")
-        .redirects(5)
-        // .proxy(APROXY_CONF['uri'])
-        // 设置超时会导致文件过大时写入出错
-        // .timeout(timeout)
-        .pipe(through(
-          (chunk) => {
-            downsize += chunk.length;
-            tempData.push(chunk);
-            if(totalsize>0){
-              var progress = parseInt(downsize/totalsize*100);
-              event.sender.send(`update-dlprogress-${hash}`, progress, true);
-            }else{
-              event.sender.send(`update-dlprogress-${hash}`, downsize, false);
-            }
-          },
-          () => {
-            that.logger.debug("Download end.");
-            let tempDataBuffer = Buffer.concat(tempData);
+    let url = "https://github.com/AntSwordProject/AntSword/archive/master.tar.gz";
+    superagent
+      .head(url)
+      .set('User-Agent', "antSword/v2.0")
+      .redirects(5)
+      .timeout(30000)
+      .end((err, res) => {
+        if (err) {
+          event
+            .sender
+            .send(`update-error-${hash}`, err);
+        } else {
+          totalsize = parseInt(res.header['content-length']);
+          superagent
+            .get(url)
+            .set('User-Agent', "antSword/v2.0")
+            .redirects(5)
+            // .proxy(APROXY_CONF['uri']) 设置超时会导致文件过大时写入出错 .timeout(timeout)
+            .pipe(through((chunk) => {
+              downsize += chunk.length;
+              tempData.push(chunk);
+              if (totalsize > 0) {
+                var progress = parseInt(downsize / totalsize * 100);
+                event
+                  .sender
+                  .send(`update-dlprogress-${hash}`, progress, true);
+              } else {
+                event
+                  .sender
+                  .send(`update-dlprogress-${hash}`, downsize, false);
+              }
+            }, () => {
+              that
+                .logger
+                .debug("Download end.");
+              let tempDataBuffer = Buffer.concat(tempData);
 
-            if (totalsize > 0 && downsize != totalsize) {
-              event.sender.send(`update-error-${hash}`, "Download Error.");
-              return
-            }
-            event.sender.send(`update-dlend-${hash}`, tempDataBuffer.length);
-            // 同步写入文件
-            fs.writeFileSync(savePath, tempDataBuffer);
-            // 删除内存数据
-            tempDataBuffer = tempData = null;
+              if (totalsize > 0 && downsize != totalsize) {
+                event
+                  .sender
+                  .send(`update-error-${hash}`, "Download Error.");
+                return
+              }
+              event
+                .sender
+                .send(`update-dlend-${hash}`, tempDataBuffer.length);
+              // 同步写入文件
+              fs.writeFileSync(savePath, tempDataBuffer);
+              // 删除内存数据
+              tempDataBuffer = tempData = null;
 
-            // TODO: 需不需要备份?
-            // TODO: 删除原来的 node_modules 目录
-            // 解压数据
-            tar.x({
-              file: savePath,
-              strip: 1,
-              C: process.env.AS_WORKDIR,
-            }).then(_=>{
-              that.logger.info("update success.");
-              event.sender.send(`update-success`);
-              fs.unlink(savePath);
-            }, err=>{
-              event.sender.send(`update-error-${hash}`, err);
-              fs.unlink(savePath);
-            });
-          }
-        ));
-      }
-    });
+              // TODO: 需不需要备份?
+              // TODO: 删除原来的 node_modules 目录 解压数据
+              tar
+                .x({
+                  file: savePath,
+                  strip: 1,
+                  C: process.env.AS_WORKDIR
+                })
+                .then(_ => {
+                  that
+                    .logger
+                    .info("update success.");
+                  event
+                    .sender
+                    .send(`update-success`);
+                  fs.unlink(savePath);
+                }, err => {
+                  event
+                    .sender
+                    .send(`update-error-${hash}`, err);
+                  fs.unlink(savePath);
+                });
+            }));
+        }
+      });
   }
 }
 

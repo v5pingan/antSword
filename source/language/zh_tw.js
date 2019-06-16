@@ -1,5 +1,5 @@
 //
-// language::zh_tw
+// language::zh
 //
 module.exports = {
   title: '中國蟻劍',
@@ -69,7 +69,8 @@ module.exports = {
       pluginStore: '插件市場',
       clearCache: '清空緩存',
       clearAllCache: '清空所有緩存',
-      viewsite: '瀏覽網站'
+      viewsite: '瀏覽網站',
+      copyurl: '複製URL'
     },
     category: {
       title: '分類目錄',
@@ -85,8 +86,8 @@ module.exports = {
       del: {
         title: '刪除分類',
         confirm: '確定刪除此分類嗎？（數據將清空）',
-        success: (category) => antSword.noxss(`成功刪除分類（${category}）！`),
-        error: (category, err) => antSword.noxss(`刪除分類（${category}）失敗！\n${err}`)
+        success: (category) => `成功刪除分類（${category}）！`,
+        error: (category, err) => `刪除分類（${category}）失敗！\n${err}`
       },
       rename: {
         title: '重命名分類',
@@ -126,7 +127,7 @@ module.exports = {
         test_warning: '返回數據為空',
         warning: '請輸入完整！',
         success: '添加數據成功！',
-        error: (err) => antSword.noxss(`添加數據失敗！\n${err}`)
+        error: (err) => `添加數據失敗！\n${err}`
       },
       edit: {
         title: (url) => antSword.noxss(`編輯數據（${url}）`),
@@ -144,29 +145,29 @@ module.exports = {
         },
         warning: '請輸入完整！',
         success: '更新數據成功！',
-        error: (err) => antSword.noxss(`更新數據失敗！\n${err}`)
+        error: (err) => `更新數據失敗！\n${err}`
       },
       del: {
         title: '刪除數據',
         confirm: (len) => antSword.noxss(`確定刪除選中的${len}條數據嗎？`),
-        success: (len) => antSword.noxss(`成功刪除${len}條數據！`),
-        error: (err) => antSword.noxss(`刪除失敗！\n${err}`)
+        success: (len) => `成功刪除${len}條數據！`,
+        error: (err) => `刪除失敗！\n${err}`
       },
       move: {
-        success: (num) => antSword.noxss(`成功移動${num}條數據！`),
-        error: (err) => antSword.noxss(`移動數據失敗！\n${err}`)
+        success: (num) => `成功移動${num}條數據！`,
+        error: (err) => `移動數據失敗！\n${err}`
       },
       clearCache: {
         title: '清空緩存',
         confirm: '確定清空此緩存嗎？',
         success: '清空緩存完畢！',
-        error: (err) => antSword.noxss(`清空緩存失敗！\n${err}`)
+        error: (err) => `清空緩存失敗！\n${err}`
       },
       clearAllCache: {
         title: '清空緩存',
         confirm: '確定清空所有緩存數據嗎？',
         success: '清空全部緩存完畢！',
-        error: (err) => antSword.noxss(`清空全部緩存失敗！\n${err}`)
+        error: (err) => `清空全部緩存失敗！\n${err}`
       },
       accordion: {
         base: '基礎配置',
@@ -181,7 +182,8 @@ module.exports = {
           usechunk: '開啟分塊傳輸發包',
           min: '最小分塊',
           max: '最大分塊',
-          exphint: '該功能目前為實驗性功能, 無法與 Multipart 同時使用,部分類型的服務端可能不支持Chunked傳輸。此外,建議超時時長設置30s以上,避免網速不好的情況下影響數據傳輸。',
+          exphint: '該功能目前為實驗性功能, 無法與 Multipart 同時使用,部分類型的服務端可能不支持Chunked傳輸。此外,建議超時時長設置30s以上,避免網速不好的情' +
+            '況下影響數據傳輸。'
         },
         terminalCache: '虛擬終端使用緩存',
         filemanagerCache: '文件管理使用緩存',
@@ -228,49 +230,65 @@ module.exports = {
       ascmd: (cmd) => antSword.noxss(`將使用 ${cmd} 執行命令.`),
       aspowershell: {
         on: "已啟用Powershell模式",
-        off: "已關閉Powershell模式",
-      },
-    },
+        off: "已關閉Powershell模式"
+      }
+    }
   },
   filemanager: {
     title: '文件管理',
     delete: {
       title: '刪除文件',
-      confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number' ? num + ' 個文件' : num} 嗎？`),
-      success: (path) => antSword.noxss(`刪除文件成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`刪除文件 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+        ? num + ' 個文件'
+        : num} 嗎？`),
+      success: (path) => `刪除文件成功！\n${path}`,
+      error: (path, err) => `刪除文件 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     paste: {
-      success: (path) => antSword.noxss(`粘貼文件成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`粘貼文件 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      success: (path) => `粘貼文件成功！\n${path}`,
+      error: (path, err) => `粘貼文件 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     rename: {
       title: '重命名',
       success: '重命名文件成功！',
-      error: (err) => antSword.noxss(`重命名文件失敗！${err ? '\n' + err : ''}`)
+      error: (err) => `重命名文件失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     createFolder: {
       title: '新建目錄',
       value: '新目錄',
-      success: (path) => antSword.noxss(`新建目錄成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`新建目錄 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      success: (path) => `新建目錄成功！\n${path}`,
+      error: (path, err) => `新建目錄 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     createFile: {
       title: '新建文件',
       value: '新文件.txt',
-      success: (path) => antSword.noxss(`新建文件成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`新建文件 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      success: (path) => `新建文件成功！\n${path}`,
+      error: (path, err) => `新建文件 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     retime: {
       title: '更改時間',
-      success: (path) => antSword.noxss(`更改文件時間成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`更改文件時間 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      success: (path) => `更改文件時間成功！\n${path}`,
+      error: (path, err) => `更改文件時間 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     chmod: {
       title: '更改權限',
       check: "輸入應為八進制數表示的權限, eg: 0644",
-      success: (path) => antSword.noxss(`更改文件權限成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`更改文件權限 [${path}] 失敗！${err ? '\n' + err : ''}`)
+      success: (path) => `更改文件權限成功！\n${path}`,
+      error: (path, err) => `更改文件權限 [${path}] 失敗！${err
+        ? '\n' + err
+        : ''}`
     },
     wget: {
       title: 'Wget下載文件',
@@ -279,8 +297,8 @@ module.exports = {
         name: 'WGET下載',
         start: '開始下載..',
         success: '下載成功！',
-        failed: (ret) => antSword.noxss(`失敗:${ret}`),
-        error: (err) => antSword.noxss(`錯誤:${err}`)
+        failed: (ret) => `失敗:${ret}`,
+        error: (err) => `錯誤:${err}`
       }
     },
     upload: {
@@ -290,11 +308,11 @@ module.exports = {
         httperr_413: '請將上傳文件分片大小設置調低',
         httperr_etime: '請求超時,請將超時時間調大',
         httperr_econnrefused: '連接被拒絕,檢查目標或代理是否開啟',
-        failed: (err) => antSword.noxss(`失敗:${err}`),
-        error: (err) => antSword.noxss(`出錯:${err}`)
+        failed: (err) => `失敗:${err}`,
+        error: (err) => `出錯:${err}`
       },
-      success: (path) => antSword.noxss(`上傳文件成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`上傳文件 [${path}] 失敗！${err}`),
+      success: (path) => `上傳文件成功！\n${path}`,
+      error: (path, err) => `上傳文件 [${path}] 失敗！${err}`
     },
     folder: {
       title: '目錄列表'
@@ -321,7 +339,7 @@ module.exports = {
       prompt: {
         add: {
           title: '添加到書籤',
-          success: (path) => antSword.noxss(`添加書籤成功！\n${path}`),
+          success: (path) => `添加書籤成功！\n${path}`
         },
         remove: {
           title: '移除書籤',
@@ -354,7 +372,7 @@ module.exports = {
           edit: {
             title: '編輯文件',
             openwindow: '窗口打開',
-            opentab: '標籤打開',
+            opentab: '標籤打開'
           },
           delete: '刪除文件',
           rename: '重命名文件',
@@ -370,8 +388,8 @@ module.exports = {
             copypath: '複製文件路徑',
             copysuccess: '複製到剪貼板成功!',
             copyfail: '複製到剪貼板失敗!',
-            warning: (id) => antSword.noxss(`已經添加到剪貼板！\n${id}`),
-            info: (id) => antSword.noxss(`添加文件到剪貼板\n${id}`)
+            warning: (id) => `已經添加到剪貼板！\n${id}`,
+            info: (id) => `添加文件到剪貼板\n${id}`
           },
           create: {
             title: '新建',
@@ -383,15 +401,15 @@ module.exports = {
       }
     },
     editor: {
-      title: (path) => antSword.noxss(`編輯: ${path}`),
+      title: (path) => `編輯: ${path}`,
       toolbar: {
         save: '保存',
         mode: '高亮',
         encode: '用此編碼打開'
       },
-      loadErr: (err) => antSword.noxss(`加載文件出錯！\n${err}`),
-      success: (path) => antSword.noxss(`保存文件成功！\n${path}`),
-      error: (path, err) => antSword.noxss(`保存文件 [${path}] 失敗！${err}`)
+      loadErr: (err) => `加載文件出錯！\n${err}`,
+      success: (path) => `保存文件成功！\n${path}`,
+      error: (path, err) => `保存文件 [${path}] 失敗！${err}`
     },
     tasks: {
       title: '任務列表',
@@ -413,10 +431,10 @@ module.exports = {
         cancel: '取消下載',
         start: '開始下載',
         success: '下載成功',
-        error: (err) => antSword.noxss(`出錯:${err}`)
+        error: (err) => `出錯:${err}`
       },
-      error: (name, err) => antSword.noxss(`下載文件[${name}]出錯！\n${err}`),
-      success: (name) => antSword.noxss(`下載文件[${name}]成功！`)
+      error: (name, err) => `下載文件[${name}]出錯！\n${err}`,
+      success: (name) => `下載文件[${name}]成功！`
     }
   },
   database: {
@@ -440,28 +458,50 @@ module.exports = {
         desctable: '查看錶結構',
         addcolumn: '添加列',
         editcolumn: '編輯列名',
-        delcolumn: '刪除列',
+        delcolumn: '刪除列'
       }
     },
     query: {
       title: '執行SQL',
       exec: '執行',
-      clear: '清空'
+      clear: '清空',
+      bookmark: {
+        title: '書籤',
+        add: '添加書籤',
+        del: '移除書籤',
+        clear: '清空書籤'
+      },
+      prompt: {
+        add: {
+          title: '添加SQL書籤',
+          success: (sql) => `添加書籤成功!\nSQL: ${sql}`
+        },
+        remove: {
+          title: '移除書籤',
+          confirm: '確定移除此書籤?',
+          success: '移除書籤成功'
+        },
+        clear: {
+          title: '清空書籤',
+          confirm: '確定清空所有書籤嗎?',
+          success: '清空書籤成功'
+        }
+      }
     },
     result: {
       title: '執行結果',
       warning: '操作完畢，但沒有結果返回！',
       error: {
-        database: (err) => antSword.noxss(`獲取數據庫列表失敗！\n${err}`),
-        table: (err) => antSword.noxss(`獲取表數據失敗！\n${err}`),
-        column: (err) => antSword.noxss(`獲取字段列表失敗！\n${err}`),
-        query: (err) => antSword.noxss(`執行SQL失敗！\n${err}`),
+        database: (err) => `獲取數據庫列表失敗！\n${err}`,
+        table: (err) => `獲取表數據失敗！\n${err}`,
+        column: (err) => `獲取字段列表失敗！\n${err}`,
+        query: (err) => `執行SQL失敗！\n${err}`,
         parse: '返回數據格式不正確！',
         noresult: '沒有查詢結果！'
       },
       dump: {
         title: "導出查詢結果",
-        success: "導出成功",
+        success: "導出成功"
       }
     },
     notsupport: '該功能暫不支持當前類型數據庫',
@@ -487,7 +527,7 @@ module.exports = {
         title: '刪除配置',
         confirm: '確定刪除此配置嗎？',
         success: '刪除配置成功！',
-        error: (err) => antSword.noxss(`刪除配置失敗！\n${err}`)
+        error: (err) => `刪除配置失敗！\n${err}`
       },
       adddb: {
         title: '新建數據庫',
@@ -497,7 +537,7 @@ module.exports = {
         createbtn: '創建',
         cancelbtn: '取消',
         success: '創建數據庫成功',
-        error: '創建數據庫失敗',
+        error: '創建數據庫失敗'
       },
       editdb: {
         title: '修改數據庫',
@@ -507,13 +547,13 @@ module.exports = {
         updatebtn: '修改',
         cancelbtn: '取消',
         success: '修改數據庫成功',
-        error: '修改數據庫失敗',
+        error: '修改數據庫失敗'
       },
       deldb: {
         title: '刪除數據庫',
         confirm: (name) => antSword.noxss(`確定要刪除數據庫 ${name} 嗎?`),
         success: '刪除數據庫成功',
-        error: '刪除數據庫失敗',
+        error: '刪除數據庫失敗'
       },
       addtable: {
         title: '新建表',
@@ -523,27 +563,25 @@ module.exports = {
         gridheader: "名稱,類型,長度,不為空,主鍵,自增長",
         delete_not_select: "請先選中要刪除的行",
         save_row_is_null: "行數為空",
-        cell_valid_error: (i,j)=>`數據格式校驗失敗(${i+1}行,${j+1}列)`,
+        cell_valid_error: (i, j) => `數據格式校驗失敗(${i + 1}行,${j + 1}列)`,
         confirmtitle: "輸入新表名",
         invalid_tablename: "表名不能帶有特殊符號",
         success: '新建表成功',
-        error: '新建表失敗',
+        error: '新建表失敗'
       },
       edittable: {
         title: "輸入新表名",
         invalid_tablename: "表名不能帶有特殊符號",
         success: '修改表名成功',
-        error: '修改表名失敗',
+        error: '修改表名失敗'
       },
       deltable: {
-        title:'刪除表',
+        title: '刪除表',
         confirm: (name) => antSword.noxss(`確定要刪除表 ${name} 嗎?`),
         success: '刪除表成功',
-        error: '刪除表失敗',
+        error: '刪除表失敗'
       },
-      addcolumn: {
-
-      },
+      addcolumn: {},
       editcolumn: {
         title: "輸入新列名",
         invalid_tablename: "列名不能帶有特殊符號",
@@ -552,17 +590,17 @@ module.exports = {
         error: '修改列名失敗'
       },
       delcolumn: {
-        title:'刪除列',
+        title: '刪除列',
         confirm: (name) => antSword.noxss(`確定要刪除列 ${name} 嗎?`),
         success: '刪除列成功',
-        error: '刪除列失敗',
+        error: '刪除列失敗'
       }
     },
     probedb: {
       title: '檢測數據庫函數支持',
       success: '檢測完畢',
       coltype: '連接類型',
-      issupport: '狀態',
+      issupport: '狀態'
     }
   },
   settings: {
@@ -604,9 +642,11 @@ module.exports = {
       prompt: {
         btns: {
           ok: '立即更新',
-          no: '下次再說'
+          no: '下次再說',
+          changelog: '更新日誌'
         },
         body: (ver) => `發現新版本 v${ver}, 是否更新?`,
+        loader_body: (ver) => `加載器新版本 v${ver} 已經發布,當前使用的加載器即將不能使用, 是否退出程序並前往下載最新版加載器?`,
         title: '版本更新',
         changelog: '更新日誌：',
         sources: '更新來源：',
@@ -616,10 +656,10 @@ module.exports = {
         }
       },
       message: {
-        githint: (workdir)=>`當前源碼為Git管理，請關閉程序並前往 ${workdir} 手動更新`,
+        githint: (workdir) => `當前源碼為Git管理，請關閉程序並前往 ${workdir} 手動更新`,
         prepare: "連接更新服務器...",
-        dling: (progress)=> `正在下載更新包...${progress}%`,
-        dlingnp: (size)=> `正在下載更新包...${size}`,
+        dling: (progress) => `正在下載更新包...${progress}%`,
+        dlingnp: (size) => `正在下載更新包...${size}`,
         dlend: "下載完畢",
         extract: "正在解壓, 請勿關閉程序",
         ing: '努力更新中。。',
@@ -627,40 +667,63 @@ module.exports = {
         success: '更新成功！請稍後手動重啟應用！'
       }
     },
-    encoders:{
+    encoders: {
       title: '編碼管理',
+      encoder: "編碼器",
+      decoder: "解碼器",
       toolbar: {
-        new: "新建",
+        new: "新建編碼器",
+        new_decoder: "新建解碼器",
         edit: "編輯",
         delete: "刪除",
         help: "幫助",
         save: "保存",
+        rsa: "RSA配置",
+        more: "獲取更多",
+        generate: "生成"
       },
       grid: {
         ename: "名稱",
-        etype: "類型"
+        etype: "Shell類型",
+        edtype: {
+          title: "類型",
+          encoder: "編碼器",
+          decoder: "解碼器"
+        }
       },
-      edit_win_title: "編輯編碼器",
-      delete_title: "刪除編碼器",
+      form: {
+        public_key: "公鑰",
+        private_key: "私鑰",
+        php_code: "PHP 代碼"
+      },
+      rsa_config_win_title: "RSA編碼器配置",
+      edit_win_title: "編輯",
+      delete_title: "刪除",
       message: {
-        ename_duplicate: "編碼器名稱不能重複",
+        ename_duplicate: "名稱不能重複",
         rename_success: "重命名成功",
-        etype_error: "編碼器類型錯誤",
+        etype_error: "類型錯誤",
         retype_success: "類型修改成功",
-        create_success: "新增編碼器成功",
+        create_success: "新增成功",
         edit_not_select: "請先選中要編輯的行",
         edit_only_single: "只能編輯一個",
-        edit_null_value: "編碼器內容不能為空",
+        edit_null_value: "內容不能為空",
         edit_save_success: "保存成功",
         delete_not_select: "請先選中要刪除的行",
         delete_success: "刪除成功",
         ename_invalid: "名稱只能包含數字、字母、下劃線",
+        rsa_save_success: "生成 RSA 密鑰對成功",
+        rsa_save_error: "生成 RSA 密鑰對錯誤"
       },
       prompt: {
         create_encoder: "創建編碼器",
+        create_decoder: "创建解碼器"
       },
       confirm: {
-        delete: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number' ? num + ' 個編碼器' : num+" "}嗎？`),
+        generate: '妳確定要重新生成?',
+        delete: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+          ? num + ' 個編碼器'
+          : num + " "}嗎？`)
       }
     },
     aproxy: {
@@ -671,7 +734,7 @@ module.exports = {
       },
       form: {
         label: '配置訪問互聯網的代理',
-        mode:{
+        mode: {
           noproxy: '不使用代理',
           manualproxy: '手動設置代理'
         },
@@ -690,7 +753,7 @@ module.exports = {
         content: '重啟應用生效，是否重啟？',
         title: '更改代理設置'
       },
-      prompt:{
+      prompt: {
         title: '輸入測試的 URL',
         success: '連接到代理服務器成功',
         error: '連接到代理服務器失敗'
@@ -707,7 +770,7 @@ module.exports = {
       toolbar: {
         save: '保存'
       },
-      form:{
+      form: {
         shellmanager: {
           title: '數據管理',
           hiddencolumns: {
@@ -731,14 +794,14 @@ module.exports = {
         title: '更改默認設置'
       },
       toolbar: {
-        save: '保存',
+        save: '保存'
       },
       filemanager: {
         title: '文件管理',
         openfileintab: {
           title: '文件打開方式',
           window: '窗口打開',
-          tab: '標籤打開',
+          tab: '標籤打開'
         },
         bookmark: {
           title: '全局書籤',
@@ -760,7 +823,77 @@ module.exports = {
           },
           del: {
             title: '刪除書籤',
-            confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number' ? num + ' 個書籤' : num+" "}嗎？`),
+            confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+              ? num + ' 個書籤'
+              : num + " "}嗎？`),
+            success: '刪除成功'
+          },
+          edit: {
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            success: '更新成功'
+          }
+        }
+      },
+      database: {
+        title: '數據操作',
+        bookmark: {
+          title: '全局書籤',
+          nodata: '當前暫無數據, 請單擊鼠標右鍵添加',
+          grid: {
+            name: '名稱',
+            path: 'SQL'
+          },
+          bmenu: {
+            add: '添加書籤',
+            del: '刪除書籤'
+          },
+          add: {
+            title: '添加全局SQL書籤',
+            success: '添加成功',
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            addbtn: '確定'
+          },
+          del: {
+            title: '刪除書籤',
+            confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+              ? num + ' 個書籤'
+              : num + " "}嗎？`),
+            success: '刪除成功'
+          },
+          edit: {
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            success: '更新成功'
+          }
+        }
+      },
+      shellmanager: {
+        title: '數據管理',
+        header: {
+          title: '默認請求頭',
+          nodata: '暫無全局請求頭, 請單擊右鍵添加',
+          grid: {
+            name: '名稱',
+            value: '值'
+          },
+          bmenu: {
+            add: '添加請求頭',
+            del: '刪除請求頭'
+          },
+          add: {
+            title: '添加默認請求頭',
+            success: '添加成功',
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            addbtn: '確定'
+          },
+          del: {
+            title: '刪除默認請求頭',
+            confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+              ? num + ' 個請求頭'
+              : num + " "}嗎？`),
             success: '刪除成功'
           },
           edit: {
@@ -769,19 +902,56 @@ module.exports = {
             success: '更新成功'
           }
         },
+        body: {
+          title: '默認請求 Body',
+          nodata: '暫無默認Body, 請單擊右鍵添加',
+          grid: {
+            name: '名稱',
+            value: '值'
+          },
+          bmenu: {
+            add: '添加Body',
+            del: '刪除Body'
+          },
+          add: {
+            title: '添加默認請求Body',
+            success: '添加成功',
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            addbtn: '確定'
+          },
+          del: {
+            title: '刪除默認請求頭Body',
+            confirm: (num) => antSword.noxss(`你確定要刪除 ${typeof(num) === 'number'
+              ? num + ' 個請求Body'
+              : num + " "}嗎？`),
+            success: '刪除成功'
+          },
+          edit: {
+            namedup: '名稱不能重複',
+            name_invalid: '名稱不合法',
+            success: '更新成功'
+          }
+        },
+        other: {
+          nohttps: '忽略HTTPS證書',
+          requestTimeout: '請求超時'
+        }
       }
     }
   },
   plugin: {
-    error: (err) => antSword.noxss(`加載插件中心失敗！\n${err}`)
+    error: (err) => `加載插件中心失敗！\n${err}`
   },
   update: {
     title: '發現更新',
-    body: (ver) => `新的版本：${ver}, 查看更新日誌`,
+    body: (ver) => `新的版本：${ver}, 查看更新日誌`
   },
   viewsite: {
     toolbar: {
-      useproxy: (s) => `代理: ${s?'開':'關'}`,
+      useproxy: (s) => `代理: ${s
+        ? '開'
+        : '關'}`,
       save: '保存',
       view: '瀏覽'
     },

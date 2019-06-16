@@ -42,23 +42,24 @@ class Tasks {
     this.manager = manager;
   }
 
-  // const task = tasks.new('download', '/etc/passwd', '0%');
-  // task.update('20%');
+  // const task = tasks.new('download', '/etc/passwd', '0%'); task.update('20%');
   // task.end('100%');
   new(name, desc, progress) {
     // 展开panel
-    this.cell.expand();
+    this
+      .cell
+      .expand();
     // 创建一个随机ID
     const hash = String(+new Date() + Math.random()).replace('.', '_');
-    this.grid.addRow(
-      hash, [
+    this
+      .grid
+      .addRow(hash, [
         antSword.noxss(name),
         antSword.noxss(desc),
         `<div id="filemanager_progress_${hash}">-</div>`,
         new Date().format('yyyy-MM-dd hh:mm:ss'),
         `<div id="filemanager_end_time_${hash}">-</div>`
-      ], 0
-    );
+      ], 0);
     const API = {
       // 更新任务状态
       update: (progress) => {

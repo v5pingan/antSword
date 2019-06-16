@@ -29,9 +29,13 @@ class Toolbar {
     let _tbObj = [];
     [
       // id&&lang, icon, disabled
-      ['add', 'plus-circle'],
+      [
+        'add', 'plus-circle'
+      ],
       false,
-      ['rename', 'font', true],
+      [
+        'rename', 'font', true
+      ],
       false,
       ['del', 'trash', true]
     ].map((_) => {
@@ -80,29 +84,38 @@ class Toolbar {
    */
   _delCategory() {
     // 获取当前选择的分类
-    const category = this.top.sidebar.getActiveItem();
+    const category = this
+      .top
+      .sidebar
+      .getActiveItem();
     // 删除提示框
-    layer.confirm(
-      LANG['del']['confirm'], {
-        icon: 2, shift: 6,
-        title: `<i class="fa fa-trash"></i> ${LANG['del']['title']}`
-      }, (_) => {
-        layer.close(_);
-        // 1. 删除分类数据
-        const ret = antSword['ipcRenderer'].sendSync('shell-clear', category);
-        if (typeof(ret) === 'number') {
-          toastr.success(LANG['del']['success'](category), LANG_T['success']);
-          // 2. 跳转到默认分类
-          this.top.sidebar.callEvent('onSelect', ['default']);
-          // 3. 删除侧边栏
-          this.top.sidebar.items(category).remove();
-          // 4. 更新侧边栏标题
-          setTimeout(this.top.updateHeader.bind(this.top), 200);
-        }else{
-          return toastr.error(LANG['del']['error'](category, ret.toString()), LANG_T['error']);
-        }
+    layer.confirm(LANG['del']['confirm'], {
+      icon: 2,
+      shift: 6,
+      title: `<i class="fa fa-trash"></i> ${LANG['del']['title']}`
+    }, (_) => {
+      layer.close(_);
+      // 1. 删除分类数据
+      const ret = antSword['ipcRenderer'].sendSync('shell-clear', category);
+      if (typeof (ret) === 'number') {
+        toastr.success(LANG['del']['success'](category), LANG_T['success']);
+        // 2. 跳转到默认分类
+        this
+          .top
+          .sidebar
+          .callEvent('onSelect', ['default']);
+        // 3. 删除侧边栏
+        this
+          .top
+          .sidebar
+          .items(category)
+          .remove();
+        // 4. 更新侧边栏标题
+        setTimeout(this.top.updateHeader.bind(this.top), 200);
+      } else {
+        return toastr.error(LANG['del']['error'](category, ret.toString()), LANG_T['error']);
       }
-    );
+    });
   }
 
   /**
@@ -110,10 +123,11 @@ class Toolbar {
    * @return {[type]} [description]
    */
   _addCategory() {
-    this.categoryForm(
-      `<i class="fa fa-plus-circle"></i> ${LANG['add']['title']}`
-    ).then((v) => {
-      this.top.sidebar.callEvent('onSelect', [v]);
+    this.categoryForm(`<i class="fa fa-plus-circle"></i> ${LANG['add']['title']}`).then((v) => {
+      this
+        .top
+        .sidebar
+        .callEvent('onSelect', [v]);
     })
   }
 
@@ -122,15 +136,16 @@ class Toolbar {
    * @return {[type]} [description]
    */
   _renameCategory() {
-    const _category = this.top.sidebar.getActiveItem();
-    this.categoryForm(
-      `<i class="fa fa-font"></i> ${LANG['rename']['title']}`,
-      _category
-    ).then((v) => {
+    const _category = this
+      .top
+      .sidebar
+      .getActiveItem();
+    this.categoryForm(`<i class="fa fa-font"></i> ${LANG['rename']['title']}`, _category).then((v) => {
       // 禁止的分类名
       if (v === 'default') {
         return toastr.warning(LANG['rename']['disable'], LANG_T['warning']);
       };
+      v = antSword.noxss(v);
       // 判断分类是否存在
       if (this.top.sidebar.items(v)) {
         return toastr.warning(LANG['rename']['exists'], LANG_T['warning']);
@@ -144,18 +159,29 @@ class Toolbar {
         // 更新成功
         toastr.success(LANG['rename']['success'], LANG_T['success']);
         // 删除旧分类
-        this.top.sidebar.items(_category).remove();
+        this
+          .top
+          .sidebar
+          .items(_category)
+          .remove();
         // 添加新分类
-        this.top.sidebar.addItem({
-          id: v,
-          bubble: ret,
-          text: `<i class="fa fa-folder-o"></i> ${v}`
-        });
+        this
+          .top
+          .sidebar
+          .addItem({
+            id: v,
+            bubble: ret,
+            text: `<i class="fa fa-folder-o"></i> ${v}`
+          });
         // 跳转分类
         setTimeout(() => {
-          this.top.sidebar.items(v).setActive();
+          this
+            .top
+            .sidebar
+            .items(v)
+            .setActive();
         }, 233);
-      }else{
+      } else {
         toastr.error(LANG['rename']['error'], LANG_T['error']);
       }
     })
