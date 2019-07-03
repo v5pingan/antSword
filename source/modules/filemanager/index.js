@@ -871,6 +871,7 @@ class FileManager {
     let codes = '';
     let win;
     let hinttext = '';
+    let tooltip = `IP:${this.opts['ip']} File:${antSword.noxss(path)}`;
     if (openfileintab == false) {
       win = this.createWin({
         title: LANG['editor']['title'](antSword.noxss(path)),
@@ -885,7 +886,15 @@ class FileManager {
         null, null, true, true
       );
       win = antSword['tabbar'].cells(`tab_file_${_id}`);
-      hinttext = `IP:${this.opts['ip']} File:${antSword.noxss(path)}`;
+      let hitpath = path;
+      if (path.length > 100) {
+        let tmpbuf = Buffer.alloc(100, '.');
+        tmpbuf.write(this.path, 0, 100 - name.length - 4);
+        tmpbuf.write('/', 100 - name.length - 1);
+        tmpbuf.write(name, 100 - name.length);
+        hitpath = tmpbuf.toString();
+      }
+      hinttext = `IP:${this.opts['ip']} File:${antSword.noxss(hitpath)}`;
     }
 
     win.progressOn();
@@ -987,6 +996,7 @@ class FileManager {
         options: _options
       },
     ]);
+    toolbar.setItemToolTip('hinttext', tooltip);
     toolbar.attachEvent('onClick', (id) => {
       if (id === 'save') {
         // 保存代码
