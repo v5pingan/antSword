@@ -61,6 +61,9 @@ class Terminal {
             .term
             .exec(`cd ${this.options.path}`);
         }
+        if (this.options.hasOwnProperty("exec")) {
+          this.core.command.exec = this.options.exec;
+        }
       })
       .catch((err) => {
         toastr.error((typeof (err) === 'object') ?

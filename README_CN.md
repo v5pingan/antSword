@@ -1,4 +1,4 @@
-# 中国蚁剑 [![release](https://img.shields.io/badge/release-v2.1.3-blue.svg?style=flat-square)][url-release]
+# 中国蚁剑 [![release](https://img.shields.io/badge/release-v2.1.4-blue.svg?style=flat-square)][url-release]
 
 > 一剑在手，纵横无忧！
 
@@ -40,7 +40,7 @@
 参见文档 [支持蚁剑][url-contribute]
 
 ## 致敬感谢
-> 中国蚁剑的核心代码模板均改自伟大的**中国菜刀**，在此向作者感谢以及致敬！致敬每一位为网络安全做出点滴贡献的心老前辈！
+> 中国蚁剑的核心代码模板均改自伟大的**中国菜刀**，在此向作者感谢以及致敬！致敬每一位为网络安全做出点滴贡献的新老前辈！
 
 **一路走来，得到了很多朋友的参与开发以及点滴赞助，在此感谢陪伴，感谢你们能让它越走越远！**
 

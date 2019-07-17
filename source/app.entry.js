@@ -68,6 +68,10 @@ const antSword = window.antSword = {
    */
   modules: {},
   /**
+   * 模块
+   */
+  module: {},
+  /**
    * localStorage存储API
    * ? 如果只有一个key参数，则返回内容，否则进行设置
    * @param  {String} key   存储键值，必选
@@ -281,6 +285,11 @@ antSword['tabbar'] = new dhtmlXTabBar(document.body);
   let _module = require(`./modules/${_}/`);
   antSword['modules'][_] = new _module();
 });
+
+['shellmanager', 'settings', 'plugin', 'database', 'terminal', 'viewsite', 'filemanager'].map((_) => {
+  antSword['module'][_] = require(`./modules/${_}/`);
+})
+
 // 移除加载界面&&设置标题
 $('#loading').remove();
 document.title = antSword['language']['title'] || 'AntSword';

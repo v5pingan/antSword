@@ -440,7 +440,7 @@ class FileManager {
       this.core.request(
         this.core.filemanager.create_file({
           path: this.path + value,
-          content: 'Halo ANT!'
+          content: '#Halo ANT!'
         })
       ).then((res) => {
         let ret = res['text'];

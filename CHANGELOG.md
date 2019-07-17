@@ -2,6 +2,42 @@
 > 有空会补补BUG、添添新功能。    
 > 同时也欢迎大家的参与！感谢各位朋友的支持！ .TAT.
 
+## 2019/07/16 `v(2.1.4)`
+
+### 核心模块
+
+* 增加 PHP 执行命令的函数(`proc_open`,`COM('Wscript.shell')`, `shellshock`) #194
+
+  * `COM` 组件执行命令, 该模块为 Windows 专属, 需要目标在 php.ini 中打开 COM 选项: `com.allow_dcom = true`, 注意, PHP 5.4.5 后,com/dotnet模块已经成了单独的扩展, 所以还需要在 php.ini 中配置 `extension=php_com_dotnet.dll`, 如果 PHP < 5.4.5 则不需要。
+  * `shellshock` 利用 bash 破壳(CVE-2014-6271)执行命令, 需要目标的 `/bin/sh` 链接为 `/bin/bash` 且存在破壳漏洞
+
+* 新增全局变量 antSword['module'] 用于存放所有核心模块, 方便在插件中引入
+
+### 文件管理
+
+* 修复标签页编辑文件时,路径过长导致右侧按钮不显示的 bug (#192)
+* 新建文件时, 默认内容前面加了 `#` 号(防止在shell当前目录下, 新建 `.htaccess` 语法错误导致整个目录无法解析)
+
+### 虚拟终端
+
+* 新增 `options['exec']` 用于替换当前 Terminal 中生成 payload 函数
+
+### 插件相关
+
+* [绕过 disable_functions](https://github.com/Medicean/as_bypass_php_disable_functions) 更新到 0.4
+
+  * 新增「FastCGI/PHP-FPM」模式
+
+   适用于PHP-FPM/FCGI 监听在 unix socket 或者 tcp socket 上时使用。常见的比如: nginx + fpm。IIS+FPM 使用的是「管道」通信，不适用。
+
+  * 新增「Apache_Mod_CGI」模式
+
+    利用 `.htaccess` 添加一个新的 cgi 后缀, 完成命令执行
+  
+  * 优化了 `.antproxy.php` 性能问题
+  * 修复了 `.antproxy.php` 不会代理 querystring 的问题
+  * 以上模式可在 「AntSword-Labs」仓库中找到相关 Docker 环境, 可自行在本机搭建环境测试
+
 ## 2019/06/11 `v(2.1.3)`
 
 ### 核心模块
